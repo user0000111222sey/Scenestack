@@ -1,0 +1,3970 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0E0E10">
+  <title>Scene Stack — Quiet Cinema Studio</title>
+  <style>
+    /* ==========================================================================
+       SCENE STACK — DESIGN TOKENS & "QUIET CINEMA" THEME
+       ========================================================================== */
+    :root {
+      --sat: 48px;
+      --sab: 24px;
+      --sal: 0px;
+      --sar: 0px;
+      /* Top margin specifically for notch and status bar clearance:
+         Guarantees nothing interactive or readable is ever rendered under the notch */
+      --top-notch-margin: 18px;
+      --safe-top: calc(max(env(safe-area-inset-top, 0px), var(--sat, 48px)) + var(--top-notch-margin));
+      --safe-bottom: max(env(safe-area-inset-bottom, 0px), var(--sab, 24px), 24px);
+      --safe-left: max(env(safe-area-inset-left, 0px), var(--sal, 0px));
+      --safe-right: max(env(safe-area-inset-right, 0px), var(--sar, 0px));
+
+      /* Quiet Cinema Dark (Default) */
+      --bg: #0E0E10;
+      --surface: #161618;
+      --surface-2: #1E1E21;
+      --border: #2A2A2E;
+      --text: #ECECEC;
+      --text-muted: #8E8E93;
+      --text-faint: #5A5A60;
+      --accent: #E8E2D0;
+      --accent-dark: #0E0E10;
+      --danger: #D96B6B;
+      --warning: #D9A066;
+      --success: #7FB28C;
+      --info: #6FA8B8;
+
+      /* Metrics & Typography Defaults */
+      --radius-card: 14px;
+      --radius-sheet: 16px;
+      --radius-pill: 999px;
+      --radius-input: 10px;
+
+      --font-ui: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-script: "Courier Prime", "Courier New", Courier, monospace;
+      --font-size-body: 15px;
+      --line-height-body: 1.6;
+
+      --tab-height: 56px;
+      --topbar-height: 52px;
+      --trans-speed: 180ms ease-out;
+    }
+
+    body.light-theme {
+      --bg: #F6F5F2;
+      --surface: #FFFFFF;
+      --surface-2: #EFEEEA;
+      --border: #E2E0DA;
+      --text: #1A1A1A;
+      --text-muted: #6B6B6B;
+      --text-faint: #9E9E9E;
+      --accent: #262626;
+      --accent-dark: #FFFFFF;
+      --danger: #C24141;
+      --warning: #B37436;
+      --success: #4E8A5E;
+      --info: #3D7A8C;
+    }
+
+    body.sepia-theme {
+      --bg: #F4EEDF;
+      --surface: #E8E0CE;
+      --surface-2: #DCD2BD;
+      --border: #C8BDA5;
+      --text: #34281D;
+      --text-muted: #746452;
+      --text-faint: #9E8D79;
+      --accent: #34281D;
+      --accent-dark: #F4EEDF;
+    }
+
+    body.oled-theme {
+      --bg: #000000;
+      --surface: #0A0A0C;
+      --surface-2: #141416;
+      --border: #202024;
+      --text: #F5F5F7;
+      --text-muted: #8E8E93;
+      --text-faint: #48484A;
+      --accent: #FFFFFF;
+      --accent-dark: #000000;
+    }
+
+    /* Density Overrides */
+    body.compact-mode {
+      --font-size-body: 14px;
+      --line-height-body: 1.45;
+      --tab-height: 48px;
+      --topbar-height: 46px;
+    }
+
+    /* Left handed mode */
+    body.left-handed .primary-fab {
+      right: auto !important;
+      left: calc(var(--safe-left) + 20px) !important;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      outline: none;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-ui);
+      font-size: var(--font-size-body);
+      line-height: var(--line-height-body);
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* APP ROOT */
+    #app {
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      background-color: var(--bg);
+    }
+
+    /* SCREENS */
+    .screen {
+      display: none;
+      width: 100%;
+      height: 100%;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+    .screen.active {
+      display: flex;
+    }
+
+    /* COMMON LINE ICON BUTTONS */
+    .icon-btn {
+      width: 44px;
+      height: 44px;
+      min-width: 44px;
+      border-radius: var(--radius-pill);
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: color var(--trans-speed), background var(--trans-speed), transform var(--trans-speed);
+      flex-shrink: 0;
+    }
+    .icon-btn:hover {
+      color: var(--text);
+      background: var(--surface-2);
+    }
+    .icon-btn:active {
+      transform: scale(0.95);
+    }
+
+    .icon-btn-sm {
+      width: 36px;
+      height: 36px;
+      min-width: 36px;
+      border-radius: var(--radius-input);
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: color var(--trans-speed), border-color var(--trans-speed), background var(--trans-speed);
+    }
+    .icon-btn-sm:hover {
+      color: var(--text);
+      border-color: var(--text-muted);
+    }
+    .icon-btn-sm.danger:hover {
+      color: var(--danger);
+      border-color: var(--danger);
+    }
+
+    /* ==========================================================================
+       TOP BARS WITH PROMINENT TOP MARGIN (NEVER UNDER NOTCH)
+       ========================================================================== */
+    .home-topbar {
+      margin-top: 8px;
+      padding-top: var(--safe-top);
+      padding-left: calc(var(--safe-left) + 20px);
+      padding-right: calc(var(--safe-right) + 20px);
+      padding-bottom: 12px;
+      min-height: calc(var(--topbar-height) + var(--safe-top));
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+      background: var(--bg);
+      z-index: 20;
+    }
+    .home-title {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: var(--text);
+    }
+
+    .home-controls {
+      padding: 10px 20px 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .search-box {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-pill);
+      padding: 0 14px;
+      height: 40px;
+    }
+    .search-box input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-size: 14px;
+      font-family: inherit;
+    }
+    .search-box input::placeholder {
+      color: var(--text-faint);
+    }
+
+    .sort-select {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      border-radius: var(--radius-pill);
+      padding: 0 12px;
+      height: 40px;
+      font-size: 13px;
+      font-family: inherit;
+      cursor: pointer;
+    }
+
+    /* RECENT PROJECTS CHIPS */
+    .recent-chips-bar {
+      display: none;
+      padding: 0 20px 8px 20px;
+      gap: 8px;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+    .recent-chips-bar::-webkit-scrollbar { display: none; }
+    .recent-chip {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 5px 14px;
+      border-radius: var(--radius-pill);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .recent-chip:hover {
+      color: var(--text);
+      border-color: var(--text-muted);
+    }
+
+    .home-scroll-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 20px calc(var(--safe-bottom) + 96px) 20px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .projects-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    @media (min-width: 680px) {
+      .projects-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .project-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      cursor: pointer;
+      position: relative;
+      transition: background var(--trans-speed), transform var(--trans-speed);
+    }
+    .project-card:hover {
+      background: var(--surface-2);
+    }
+    .project-card:active {
+      transform: scale(0.99);
+    }
+
+    .project-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .project-card-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.3;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .format-pill {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 2px 8px;
+      border-radius: var(--radius-pill);
+      background: var(--surface-2);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .card-goal-line {
+      width: 100%;
+      height: 2px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+      display: none;
+    }
+    .card-goal-fill {
+      height: 100%;
+      background: var(--accent);
+      width: 0%;
+      transition: width var(--trans-speed);
+    }
+
+    .project-card-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+    .project-dots-row {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .char-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* ONBOARDING TIPS */
+    .onboarding-banner {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      padding: 12px 16px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+      color: var(--text);
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .onboarding-banner button {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 12px;
+      padding: 4px;
+    }
+
+    /* EMPTY STATE */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 45vh;
+      text-align: center;
+      gap: 14px;
+      padding: 20px;
+    }
+    .empty-state-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .empty-state-sub {
+      font-size: 14px;
+      color: var(--text-muted);
+      max-width: 280px;
+    }
+    .sample-link {
+      color: var(--text-muted);
+      font-size: 13px;
+      text-decoration: underline;
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      padding: 6px;
+    }
+
+    .home-more-row {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 28px;
+      font-size: 13px;
+    }
+    .home-more-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .home-more-link:hover {
+      color: var(--text);
+    }
+
+    /* ==========================================================================
+       LEVEL 2: PROJECT EDITOR
+       ========================================================================== */
+    .editor-topbar {
+      margin-top: 8px;
+      padding-top: var(--safe-top);
+      padding-left: calc(var(--safe-left) + 12px);
+      padding-right: calc(var(--safe-right) + 12px);
+      padding-bottom: 8px;
+      min-height: calc(var(--topbar-height) + var(--safe-top));
+      height: auto;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+      z-index: 40;
+      position: relative;
+    }
+    .editor-title-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      max-width: calc(100% - 110px);
+      cursor: pointer;
+    }
+    .editor-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-align: center;
+    }
+
+    /* 2px Goal Progress Bar */
+    .topbar-goal-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: transparent;
+      overflow: hidden;
+    }
+    .topbar-goal-fill {
+      height: 100%;
+      background: var(--accent);
+      width: 0%;
+      transition: width var(--trans-speed);
+    }
+
+    /* STICKY SCENE MINI-LABEL */
+    .sticky-scene-bar {
+      position: sticky;
+      top: 0;
+      background: rgba(14, 14, 16, 0.94);
+      backdrop-filter: blur(8px);
+      padding: 8px 20px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      z-index: 30;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    body.light-theme .sticky-scene-bar {
+      background: rgba(246, 245, 242, 0.94);
+    }
+
+    .scene-jump-btn {
+      background: transparent;
+      border: none;
+      color: inherit;
+      font-size: inherit;
+      font-weight: inherit;
+      text-transform: inherit;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: calc(100% - 70px);
+    }
+    .scene-jump-btn:hover {
+      color: var(--text);
+    }
+
+    .sticky-tools-row {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* FOCUS MODE FULLSCREEN BANNER & TIMER */
+    .focus-exit-trigger {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: calc(var(--safe-top) + 36px);
+      z-index: 120;
+      cursor: pointer;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent);
+    }
+    .focus-clock {
+      position: fixed;
+      top: calc(var(--safe-top) + 16px);
+      right: calc(var(--safe-right) + 16px);
+      font-size: 11px;
+      color: var(--text-faint);
+      z-index: 125;
+      display: none;
+      background: rgba(0,0,0,0.5);
+      padding: 3px 10px;
+      border-radius: var(--radius-pill);
+    }
+
+    body.focus-mode-active .editor-topbar,
+    body.focus-mode-active .sticky-scene-bar,
+    body.focus-mode-active .bottom-tab-bar,
+    body.focus-mode-active .primary-fab {
+      display: none !important;
+    }
+    body.focus-mode-active .focus-exit-trigger,
+    body.focus-mode-active .focus-clock {
+      display: block;
+    }
+
+    /* EDITOR MAIN WORKSPACE */
+    .editor-workspace {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      padding: 16px 20px calc(var(--tab-height) + var(--safe-bottom) + 64px) 20px;
+      position: relative;
+    }
+
+    /* TYPEWRITER SCROLLING */
+    body.typewriter-mode .editor-workspace {
+      padding-top: 40vh;
+      padding-bottom: 50vh;
+    }
+
+    /* SCRIPT FLOW */
+    .script-flow {
+      max-width: 760px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .scene-wrap {
+      margin-bottom: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* SCRIPT BLOCK */
+    .script-block {
+      position: relative;
+      padding: 8px 12px;
+      border-radius: 10px;
+      cursor: text;
+      transition: background var(--trans-speed), opacity var(--trans-speed);
+      border-left: 3px solid transparent;
+      user-select: text;
+      -webkit-user-select: text;
+    }
+    .script-block:hover {
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .script-block.selected {
+      background: var(--surface);
+      border-radius: 10px;
+    }
+    .script-block.muted-block {
+      opacity: 0.35;
+      text-decoration: line-through;
+    }
+
+    body.dim-inactive-blocks .script-block:not(.selected) {
+      opacity: 0.38;
+    }
+
+    /* BLOCK TYPOGRAPHY */
+    .block-heading-text {
+      font-size: 16px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text);
+      padding: 12px 0 4px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .block-action-text {
+      font-size: var(--font-size-body);
+      color: var(--text);
+      line-height: var(--line-height-body);
+      white-space: pre-wrap;
+    }
+
+    .script-block.dialogue {
+      padding-left: 14px;
+    }
+    .dialogue-speaker-name {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 2px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .dialogue-text {
+      font-size: var(--font-size-body);
+      color: var(--text);
+      line-height: var(--line-height-body);
+      white-space: pre-wrap;
+    }
+
+    .block-parenthetical-text {
+      font-size: 14px;
+      font-style: italic;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+    .block-shot-text {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--success);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .block-transition-text {
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      text-align: right;
+      color: var(--text-muted);
+      padding: 8px 0;
+    }
+    .block-sound-text {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: #C98BAE;
+    }
+    .block-note-text {
+      font-size: 13px;
+      font-style: italic;
+      color: #C9C078;
+      background: rgba(201, 192, 120, 0.08);
+      padding: 4px 8px;
+      border-radius: 6px;
+    }
+    .block-comment-indicator {
+      margin-top: 4px;
+      padding: 3px 8px;
+      background: rgba(217, 160, 102, 0.12);
+      border-left: 2px solid var(--warning);
+      font-size: 11px;
+      color: var(--warning);
+      border-radius: 2px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .block-textarea {
+      width: 100%;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-family: inherit;
+      font-size: inherit;
+      line-height: inherit;
+      resize: none;
+      padding: 0;
+      user-select: text;
+      -webkit-user-select: text;
+    }
+    .block-textarea:focus {
+      outline: none;
+    }
+
+    /* COURIER SCREENPLAY FORMAT OVERRIDE */
+    .screenplay-mode .block-heading-text,
+    .screenplay-mode .block-action-text,
+    .screenplay-mode .dialogue-text,
+    .screenplay-mode .block-parenthetical-text,
+    .screenplay-mode .block-shot-text,
+    .screenplay-mode .block-transition-text,
+    .screenplay-mode .block-textarea {
+      font-family: var(--font-script) !important;
+      font-size: 15px !important;
+      line-height: 1.6 !important;
+    }
+    .screenplay-mode .dialogue-speaker-name {
+      text-align: center;
+      justify-content: center;
+    }
+    .screenplay-mode .script-block.dialogue {
+      max-width: 70%;
+      margin: 0 auto;
+    }
+
+    /* ==========================================================================
+       TACTILE LINE-ICON ACTION BAR (APPEARS ON SELECTED BLOCK)
+       ========================================================================== */
+    .block-action-row {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      padding-top: 8px;
+      margin-top: 6px;
+      border-top: 1px solid var(--border);
+      animation: fadeIn 140ms ease-out;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+    .script-block.selected .block-action-row {
+      display: flex;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* KEYBOARD STICKY TOOLBAR */
+    .block-edit-toolbar {
+      display: none;
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: calc(var(--tab-height) + var(--safe-bottom));
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 8px 16px;
+      gap: 8px;
+      overflow-x: auto;
+      white-space: nowrap;
+      z-index: 60;
+      -webkit-overflow-scrolling: touch;
+    }
+    .block-edit-toolbar::-webkit-scrollbar { display: none; }
+    .block-edit-toolbar.active {
+      display: flex;
+    }
+    .tool-chip {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 6px 14px;
+      border-radius: var(--radius-pill);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .tool-chip:hover, .tool-chip.active {
+      color: var(--text);
+      border-color: var(--text-muted);
+    }
+
+    /* BOARD VIEW */
+    .board-controls {
+      max-width: 800px;
+      margin: 0 auto 12px auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .board-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    @media (min-width: 600px) {
+      .board-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    .board-scene-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      padding: 16px 18px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      position: relative;
+      transition: background var(--trans-speed), transform var(--trans-speed);
+    }
+    .board-scene-card:hover {
+      background: var(--surface-2);
+    }
+    .board-scene-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .board-scene-title {
+      font-size: 15px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .board-scene-summary {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.4;
+      min-height: 36px;
+    }
+    .board-scene-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--text-faint);
+      margin-top: 4px;
+    }
+
+    /* SHOTS VIEW */
+    .shots-scroll {
+      max-width: 760px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .shot-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .shot-group-header {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      padding: 0 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .shot-row {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-input);
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .shot-row:hover {
+      background: var(--surface-2);
+    }
+    .shot-num {
+      font-weight: 700;
+      color: var(--success);
+      min-width: 24px;
+    }
+    .shot-pill-tag {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: var(--radius-pill);
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+    .shot-desc {
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: var(--text-muted);
+    }
+
+    /* CAST VIEW */
+    .cast-scroll {
+      max-width: 680px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .segmented-control {
+      display: flex;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-pill);
+      padding: 3px;
+      margin-bottom: 8px;
+    }
+    .segment-btn {
+      flex: 1;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 0;
+      border-radius: var(--radius-pill);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .segment-btn.active {
+      background: var(--surface-2);
+      color: var(--text);
+    }
+    .entity-row {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+      transition: background var(--trans-speed);
+    }
+    .entity-row:hover {
+      background: var(--surface-2);
+    }
+    .entity-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      font-weight: 700;
+      color: #0E0E10;
+      flex-shrink: 0;
+    }
+    .entity-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .entity-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .entity-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* BOTTOM TAB BAR (MAX 4 TABS: WRITE, BOARD, SHOTS, CAST) */
+    .bottom-tab-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: calc(var(--tab-height) + var(--safe-bottom) + 16px);
+      padding-bottom: calc(var(--safe-bottom) + 16px);
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      z-index: 50;
+      flex-shrink: 0;
+    }
+    .tab-btn {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      height: 100%;
+      padding-top: 4px;
+      transition: color var(--trans-speed);
+    }
+    .tab-btn:hover {
+      color: var(--text);
+    }
+    .tab-pill-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px 16px;
+      border-radius: var(--radius-pill);
+      transition: background var(--trans-speed);
+    }
+    .tab-btn.active .tab-pill-wrap {
+      background: var(--surface-2);
+    }
+    .tab-btn.active {
+      color: var(--accent);
+    }
+    .tab-label {
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    /* FLOATING ACTION BUTTON (+) */
+    .primary-fab {
+      position: fixed;
+      right: calc(var(--safe-right) + 20px);
+      bottom: calc(var(--tab-height) + var(--safe-bottom) + 24px);
+      width: 52px;
+      height: 52px;
+      border-radius: var(--radius-pill);
+      background: var(--accent);
+      color: var(--accent-dark);
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.4);
+      z-index: 45;
+      transition: transform var(--trans-speed), opacity 200ms ease;
+    }
+    .primary-fab:active {
+      transform: scale(0.92);
+    }
+    .primary-fab.scrolling {
+      opacity: 0.4;
+    }
+
+    /* BOTTOM SHEETS & DRAWERS */
+    .sheet-backdrop {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(2px);
+      z-index: 100;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .sheet-backdrop.open {
+      display: flex;
+    }
+    .bottom-sheet {
+      width: 100%;
+      max-width: 640px;
+      max-height: calc(100dvh - var(--safe-top) - 16px);
+      background: var(--surface);
+      border-top-left-radius: var(--radius-sheet);
+      border-top-right-radius: var(--radius-sheet);
+      border: 1px solid var(--border);
+      border-bottom: none;
+      display: flex;
+      flex-direction: column;
+      margin-top: calc(var(--safe-top) + 8px);
+      padding-bottom: calc(var(--safe-bottom) + 20px);
+      animation: slideUp var(--trans-speed);
+      overflow: hidden;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+    .sheet-handle-bar {
+      width: 36px;
+      height: 4px;
+      background: var(--border);
+      border-radius: var(--radius-pill);
+      margin: 10px auto 4px auto;
+      flex-shrink: 0;
+    }
+    .sheet-header {
+      padding: 12px 20px 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .sheet-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .sheet-body {
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* BINDER DRAWER */
+    .binder-drawer {
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      width: 84%;
+      max-width: 320px;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      z-index: 110;
+      display: flex;
+      flex-direction: column;
+      transform: translateX(-100%);
+      transition: transform var(--trans-speed);
+      box-shadow: 4px 0 24px rgba(0,0,0,0.5);
+      margin-top: 8px;
+      padding-top: var(--safe-top);
+      padding-bottom: var(--safe-bottom);
+    }
+    .binder-drawer.open {
+      transform: translateX(0);
+    }
+    .binder-header {
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+    .binder-tree {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .binder-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-faint);
+      padding: 8px 10px 4px 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .binder-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: var(--radius-input);
+      cursor: pointer;
+      color: var(--text);
+      font-size: 13px;
+    }
+    .binder-item:hover {
+      background: var(--surface-2);
+    }
+
+    /* MENU ROWS WITH LINE ICONS */
+    .menu-section-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-faint);
+      margin-top: 12px;
+      margin-bottom: 4px;
+    }
+    .menu-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: var(--radius-input);
+      background: var(--surface-2);
+      color: var(--text);
+      border: none;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: left;
+    }
+    .menu-row:hover {
+      filter: brightness(1.1);
+    }
+    .menu-row.danger {
+      color: var(--danger);
+    }
+    .menu-row svg {
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .input-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+    .text-input, .textarea-input, .select-input {
+      width: 100%;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 15px;
+      padding: 12px 14px;
+      border-radius: var(--radius-input);
+    }
+    .btn-primary {
+      width: 100%;
+      height: 48px;
+      background: var(--accent);
+      color: var(--accent-dark);
+      border: none;
+      border-radius: var(--radius-pill);
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-secondary {
+      width: 100%;
+      height: 44px;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: var(--radius-pill);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    /* TOAST */
+    .toast-box {
+      position: fixed;
+      bottom: calc(var(--tab-height) + var(--safe-bottom) + 20px);
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 10px 18px;
+      border-radius: var(--radius-pill);
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 200;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+      transition: transform var(--trans-speed), opacity var(--trans-speed);
+      opacity: 0;
+      pointer-events: none;
+    }
+    .toast-box.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .toast-undo-btn {
+      background: transparent;
+      border: none;
+      color: var(--accent);
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* SPEECH BAR */
+    .speech-player-bar {
+      display: none;
+      position: fixed;
+      left: 20px;
+      right: 20px;
+      bottom: calc(var(--tab-height) + var(--safe-bottom) + 12px);
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-pill);
+      padding: 8px 16px;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 80;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+    }
+    .speech-player-bar.active {
+      display: flex;
+    }
+
+    /* SPLIT VIEW */
+    .split-ref-pane {
+      display: none;
+      height: 38%;
+      background: var(--surface);
+      border-top: 2px solid var(--border);
+      overflow-y: auto;
+      padding: 16px 20px;
+      font-size: 14px;
+      color: var(--text-muted);
+      z-index: 25;
+    }
+    .split-ref-pane.open {
+      display: block;
+    }
+
+    /* COMMAND PALETTE */
+    .cmd-palette-box {
+      width: 100%;
+      max-width: 500px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.7);
+    }
+    .cmd-input {
+      padding: 16px 20px;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid var(--border);
+      font-size: 16px;
+      color: var(--text);
+    }
+    .cmd-list {
+      max-height: 280px;
+      overflow-y: auto;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    /* PRINT */
+    @media print {
+      body { background: #fff !important; color: #000 !important; }
+      .editor-topbar, .sticky-scene-bar, .bottom-tab-bar, .primary-fab,
+      .block-edit-toolbar, .block-action-row, .sheet-backdrop, .toast-box, .speech-player-bar {
+        display: none !important;
+      }
+      .editor-workspace { overflow: visible !important; padding: 0 !important; }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <!-- ======================================================================
+         LEVEL 1: HOME (PROJECT MANAGER)
+         ====================================================================== -->
+    <div id="screen-home" class="screen active">
+      <header class="home-topbar">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent);"><rect x="2" y="2" width="20" height="20" rx="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>
+          <h1 class="home-title">Projects</h1>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <button class="icon-btn" id="btn-home-settings" title="Settings">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <div class="recent-chips-bar" id="recent-chips-bar"></div>
+
+      <div class="home-controls">
+        <div class="search-box">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-faint);"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="home-search-input" placeholder="Search stories...">
+        </div>
+        <select class="sort-select" id="home-sort-select">
+          <option value="recent">Recent</option>
+          <option value="name">Name</option>
+          <option value="created">Created</option>
+        </select>
+      </div>
+
+      <div class="home-scroll-area">
+        <div class="onboarding-banner" id="home-onboarding-tip" style="display:none;">
+          <span>Tip: Tap any project to write, or tap "+" to create an original script or beat sheet.</span>
+          <button id="btn-dismiss-tip" style="background:transparent;border:none;color:var(--text-muted);cursor:pointer;display:flex;align-items:center;padding:4px;" title="Dismiss tip">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+
+        <div class="projects-grid" id="home-projects-list"></div>
+
+        <div id="home-empty-state" class="empty-state" style="display:none;">
+          <h2 class="empty-state-title">Your first story starts here</h2>
+          <p class="empty-state-sub">Non-destructive screenwriting studio with scene stacks, character arcs, and shot coverage.</p>
+          <button class="btn-primary" style="max-width:240px;margin-top:8px;" id="btn-empty-new">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>New Project</span>
+          </button>
+          <button class="sample-link" id="btn-load-sample">Open sample project (Neon Convergence)</button>
+        </div>
+
+        <div class="home-more-row">
+          <button class="home-more-link" id="btn-home-archive">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+            <span>Archived (<span id="archive-count">0</span>)</span>
+          </button>
+          <button class="home-more-link" id="btn-home-trash">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            <span>Trash (<span id="trash-count">0</span>)</span>
+          </button>
+        </div>
+      </div>
+
+      <button class="primary-fab" id="btn-fab-new-project" title="Create New Project">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+    </div>
+
+    <!-- ======================================================================
+         LEVEL 2: PROJECT EDITOR
+         ====================================================================== -->
+    <div id="screen-editor" class="screen">
+      <div class="focus-exit-trigger" id="focus-exit-trigger" title="Tap top edge to exit Focus Mode"></div>
+      <div class="focus-clock" id="focus-clock">00:00</div>
+
+      <header class="editor-topbar" id="editor-topbar">
+        <button class="icon-btn" id="btn-editor-back" title="Back to Projects">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+
+        <div class="editor-title-wrap" id="editor-title-btn" title="Tap to rename story">
+          <span class="editor-title" id="editor-project-title">Story Title</span>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:2px;">
+          <button class="icon-btn" id="btn-topbar-undo" title="Undo" style="width:38px;height:38px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+          </button>
+          <button class="icon-btn" id="btn-topbar-redo" title="Redo" style="width:38px;height:38px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          </button>
+          <button class="icon-btn" id="btn-editor-menu" title="Story Menu" style="width:38px;height:38px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+          </button>
+        </div>
+
+        <div class="topbar-goal-bar" id="topbar-goal-bar">
+          <div class="topbar-goal-fill" id="topbar-goal-fill"></div>
+        </div>
+      </header>
+
+      <!-- STICKY SCENE MINI-LABEL -->
+      <div class="sticky-scene-bar" id="sticky-scene-bar">
+        <button class="scene-jump-btn" id="btn-sticky-scene-jump">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" style="color:var(--accent);flex-shrink:0;"><rect x="2" y="2" width="20" height="20" rx="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>
+          <span id="sticky-scene-text">SCENE 1: INT. LOCATION - DAY</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="sticky-tools-row">
+          <button class="icon-btn" id="btn-topbar-speech" style="width:34px;height:34px;" title="Table Read (Voice Aloud)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
+          </button>
+          <button class="icon-btn" id="btn-open-search" style="width:34px;height:34px;" title="Find in Script">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </button>
+          <button class="icon-btn" id="btn-open-binder" style="width:34px;height:34px;" title="Binder Tree (Scenes, Notes, Research)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- FOCUS MODE BANNER -->
+      <div class="focus-mode-banner" id="focus-banner" style="display:none;padding:8px 20px;font-size:12px;background:var(--surface-2);border-bottom:1px solid var(--border);justify-content:space-between;align-items:center;">
+        <span id="focus-banner-text">Focusing: MAYA</span>
+        <button id="btn-exit-focus" style="background:transparent;border:none;color:var(--text-muted);cursor:pointer;display:inline-flex;align-items:center;gap:4px;" title="Exit Focus Mode">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          <span>Exit</span>
+        </button>
+      </div>
+
+      <!-- MAIN EDITOR WORKSPACE -->
+      <main class="editor-workspace" id="editor-workspace">
+        <div id="pane-write" class="tab-pane">
+          <div class="script-flow" id="script-flow-container"></div>
+        </div>
+
+        <div id="pane-board" class="tab-pane" style="display:none;">
+          <div class="board-controls">
+            <span style="font-size:12px;color:var(--text-muted);" id="board-scene-count-label">0 scenes</span>
+            <select class="sort-select" id="board-filter-select" style="height:34px;font-size:12px;">
+              <option value="all">All Scenes</option>
+              <option value="Idea">Idea</option>
+              <option value="Draft">Draft</option>
+              <option value="Revised">Revised</option>
+              <option value="Final">Final</option>
+            </select>
+          </div>
+          <div class="board-grid" id="board-container"></div>
+        </div>
+
+        <div id="pane-shots" class="tab-pane" style="display:none;">
+          <div class="shots-scroll" id="shots-container"></div>
+        </div>
+
+        <div id="pane-cast" class="tab-pane" style="display:none;">
+          <div class="cast-scroll">
+            <div class="segmented-control">
+              <button class="segment-btn active" id="seg-characters">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <span>Characters</span>
+              </button>
+              <button class="segment-btn" id="seg-locations">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span>Locations</span>
+              </button>
+              <button class="segment-btn" id="seg-presence">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                <span>Matrix</span>
+              </button>
+            </div>
+            <div id="cast-entities-container" style="display:flex;flex-direction:column;gap:10px;"></div>
+          </div>
+        </div>
+      </main>
+
+      <div class="split-ref-pane" id="split-ref-pane">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <strong id="split-ref-title" style="color:var(--text);">Reference Note</strong>
+          <button class="icon-btn" id="btn-close-split" style="width:28px;height:28px;" title="Close Reference">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div id="split-ref-content"></div>
+      </div>
+
+      <div class="speech-player-bar" id="speech-player-bar">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" style="color:var(--accent);"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+          <span id="speech-current-speaker" style="font-size:12px;color:var(--text-muted);">Scene 1</span>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="icon-btn-sm" id="btn-speech-toggle" title="Play/Pause">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+          </button>
+          <button class="icon-btn-sm danger" id="btn-speech-stop" title="Stop">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="block-edit-toolbar" id="block-edit-toolbar">
+        <button class="tool-chip" data-type="heading" title="Scene Heading">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+          <span>Heading</span>
+        </button>
+        <button class="tool-chip" data-type="action" title="Action Description">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><line x1="17" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="17" y1="18" x2="3" y2="18"/></svg>
+          <span>Action</span>
+        </button>
+        <button class="tool-chip" data-type="dialogue" title="Dialogue Line">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span>Dialogue</span>
+        </button>
+        <button class="tool-chip" data-type="parenthetical" title="Parenthetical">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M8 4c-3 4-3 12 0 16"/><path d="M16 4c3 4 3 12 0 16"/></svg>
+          <span>Paren</span>
+        </button>
+        <button class="tool-chip" data-type="shot" title="Camera Shot">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          <span>Shot</span>
+        </button>
+        <button class="tool-chip" data-type="transition" title="Transition">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
+          <span>Cut To</span>
+        </button>
+        <button class="tool-chip" data-type="sound_cue" title="Sound / Music Cue">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+          <span>Sound</span>
+        </button>
+        <button class="tool-chip" data-type="note" title="Private Writer Note">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <span>Note</span>
+        </button>
+      </div>
+
+      <nav class="bottom-tab-bar" id="editor-tab-bar">
+        <button class="tab-btn active" data-tab="write" id="tab-btn-write">
+          <div class="tab-pill-wrap">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          </div>
+          <span class="tab-label">Write</span>
+        </button>
+        <button class="tab-btn" data-tab="board">
+          <div class="tab-pill-wrap">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+          </div>
+          <span class="tab-label">Board</span>
+        </button>
+        <button class="tab-btn" data-tab="shots">
+          <div class="tab-pill-wrap">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          </div>
+          <span class="tab-label">Shots</span>
+        </button>
+        <button class="tab-btn" data-tab="cast">
+          <div class="tab-pill-wrap">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <span class="tab-label">Cast</span>
+        </button>
+      </nav>
+
+      <button class="primary-fab" id="btn-fab-editor-add" title="Add Block or Quick Capture (Long Press)">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+    </div>
+
+    <!-- ======================================================================
+         BINDER DRAWER
+         ====================================================================== -->
+    <div class="sheet-backdrop" id="binder-backdrop">
+      <div class="binder-drawer" id="binder-drawer">
+        <div class="binder-header">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            <h3 style="font-size:16px;font-weight:700;">Binder</h3>
+          </div>
+          <button class="icon-btn" id="btn-close-binder" style="width:32px;height:32px;" title="Close Binder">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="binder-tree" id="binder-tree-content"></div>
+      </div>
+    </div>
+
+    <!-- GENERAL BOTTOM SHEET -->
+    <div class="sheet-backdrop" id="sheet-backdrop">
+      <div class="bottom-sheet" id="bottom-sheet-content">
+        <div class="sheet-handle-bar"></div>
+        <div class="sheet-header">
+          <h3 class="sheet-title" id="sheet-title">Sheet</h3>
+          <button class="icon-btn" id="btn-sheet-close" style="width:32px;height:32px;" title="Close Sheet">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="sheet-body" id="sheet-body"></div>
+      </div>
+    </div>
+
+    <!-- COMMAND PALETTE MODAL -->
+    <div class="sheet-backdrop" id="cmd-backdrop" style="align-items:center;">
+      <div class="cmd-palette-box">
+        <input type="text" class="cmd-input" id="cmd-input" placeholder="Type a command or jump to scene...">
+        <div class="cmd-list" id="cmd-list"></div>
+      </div>
+    </div>
+
+    <!-- TOAST BOX -->
+    <div class="toast-box" id="toast-box">
+      <span id="toast-message">Action completed</span>
+      <button class="toast-undo-btn" id="toast-undo-btn">Undo</button>
+    </div>
+  </div>
+
+  <script>
+    /* ==========================================================================
+       SCENE STACK — JAVASCRIPT ENGINE
+       ========================================================================== */
+
+    const INDEX_KEY = 'scene_stack_projects_v2';
+    const SETTINGS_KEY = 'scene_stack_settings_v2';
+
+    const PRESET_COLORS = [
+      '#C97B7B', '#D9A066', '#C9C078', '#7FB28C',
+      '#6FA8B8', '#7F8FCB', '#A98BC7', '#C98BAE'
+    ];
+
+    let Settings = {
+      theme: 'dark',
+      density: 'comfortable',
+      fontFamily: 'sans',
+      fontSize: 15,
+      lineHeight: 1.6,
+      screenplayFormatDefault: false,
+      autoCapitalizeHeadings: true,
+      smartQuotes: true,
+      autoContinuePredict: true,
+      leftHanded: false,
+      dimOtherBlocks: false,
+      typewriterDefault: false,
+      showShotBlocks: 'always'
+    };
+
+    let CurrentScreen = 'home';
+    let ActiveProjectId = null;
+    let CurrentProject = null;
+    let ActiveTab = 'write';
+    let ActiveCastSegment = 'characters';
+    let SelectedBlockId = null;
+    let FocusCharacterId = null;
+    let ReorderMode = false;
+    let ScreenplayFormat = false;
+
+    let HistoryStack = [];
+    let HistoryIndex = -1;
+
+    let SprintTimerInterval = null;
+    let SprintSecondsLeft = 0;
+    let SpeechSynth = window.speechSynthesis || null;
+    let SpeechUtterances = [];
+    let SpeechCurrentIndex = 0;
+
+    function plural(count, singular, pluralForm) {
+      return count === 1 ? `1 ${singular}` : `${count} ${pluralForm || singular + 's'}`;
+    }
+
+    function init() {
+      loadGlobalSettings();
+      applySettingsToDom();
+      renderHome();
+      setupGlobalListeners();
+      setupKeyboardViewport();
+      setupScrollFabFade();
+      checkFirstUseTips();
+    }
+
+    function loadGlobalSettings() {
+      try {
+        const raw = localStorage.getItem(SETTINGS_KEY);
+        if (raw) Object.assign(Settings, JSON.parse(raw));
+      } catch (e) {}
+    }
+
+    function saveGlobalSettings() {
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify(Settings));
+      applySettingsToDom();
+    }
+
+    function applySettingsToDom() {
+      document.body.classList.remove('light-theme', 'sepia-theme', 'oled-theme', 'compact-mode', 'left-handed');
+      if (Settings.theme === 'light') document.body.classList.add('light-theme');
+      else if (Settings.theme === 'sepia') document.body.classList.add('sepia-theme');
+      else if (Settings.theme === 'oled') document.body.classList.add('oled-theme');
+
+      if (Settings.density === 'compact') document.body.classList.add('compact-mode');
+      if (Settings.leftHanded) document.body.classList.add('left-handed');
+
+      document.documentElement.style.setProperty('--font-size-body', Settings.fontSize + 'px');
+      document.documentElement.style.setProperty('--line-height-body', Settings.lineHeight);
+
+      if (Settings.fontFamily === 'serif') document.documentElement.style.setProperty('--font-ui', 'Georgia, Cambria, serif');
+      else if (Settings.fontFamily === 'courier') document.documentElement.style.setProperty('--font-ui', 'var(--font-script)');
+      else document.documentElement.style.setProperty('--font-ui', 'system-ui, -apple-system, sans-serif');
+
+      if (Settings.dimOtherBlocks) document.body.classList.add('dim-inactive-blocks');
+      else document.body.classList.remove('dim-inactive-blocks');
+
+      if (Settings.typewriterDefault) document.body.classList.add('typewriter-mode');
+      else document.body.classList.remove('typewriter-mode');
+    }
+
+    function openFullSettingsSheet() {
+      const isDark = Settings.theme === 'dark';
+      const isLight = Settings.theme === 'light';
+      const isSepia = Settings.theme === 'sepia';
+      const isOled = Settings.theme === 'oled';
+
+      const body = `
+        <div class="menu-section-label">Appearance</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button class="icon-btn-sm ${isDark ? 'active' : ''}" style="width:auto;padding:0 12px;gap:6px;" onclick="updateSetting('theme', 'dark')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            <span>Dark</span>
+          </button>
+          <button class="icon-btn-sm ${isLight ? 'active' : ''}" style="width:auto;padding:0 12px;gap:6px;" onclick="updateSetting('theme', 'light')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            <span>Light</span>
+          </button>
+          <button class="icon-btn-sm ${isSepia ? 'active' : ''}" style="width:auto;padding:0 12px;gap:6px;" onclick="updateSetting('theme', 'sepia')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            <span>Sepia</span>
+          </button>
+          <button class="icon-btn-sm ${isOled ? 'active' : ''}" style="width:auto;padding:0 12px;gap:6px;" onclick="updateSetting('theme', 'oled')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="12" cy="12" r="10"/></svg>
+            <span>OLED</span>
+          </button>
+        </div>
+
+        <div class="input-label" style="margin-top:14px;">Interface Density</div>
+        <div style="display:flex;gap:6px;">
+          <button class="icon-btn-sm ${Settings.density === 'comfortable' ? 'active' : ''}" style="width:auto;padding:0 12px;gap:6px;" onclick="updateSetting('density', 'comfortable')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="12" x2="21" y2="12"/></svg>
+            <span>Comfortable</span>
+          </button>
+          <button class="icon-btn-sm ${Settings.density === 'compact' ? 'active' : ''}" style="width:auto;padding:0 12px;gap:6px;" onclick="updateSetting('density', 'compact')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/></svg>
+            <span>Compact</span>
+          </button>
+        </div>
+
+        <div class="menu-section-label" style="margin-top:16px;">Writing & Typography</div>
+        <div class="input-label">Script Font</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button class="icon-btn-sm ${Settings.fontFamily === 'sans' ? 'active' : ''}" style="width:auto;padding:0 12px;gap:6px;" onclick="updateSetting('fontFamily', 'sans')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+            <span>Sans</span>
+          </button>
+          <button class="icon-btn-sm ${Settings.fontFamily === 'courier' ? 'active' : ''}" style="width:auto;padding:0 12px;gap:6px;" onclick="updateSetting('fontFamily', 'courier')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            <span>Courier</span>
+          </button>
+          <button class="icon-btn-sm ${Settings.fontFamily === 'serif' ? 'active' : ''}" style="width:auto;padding:0 12px;gap:6px;" onclick="updateSetting('fontFamily', 'serif')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+            <span>Serif</span>
+          </button>
+        </div>
+
+        <div class="input-label" style="margin-top:12px;">Font Size (${Settings.fontSize}px)</div>
+        <input type="range" min="13" max="22" value="${Settings.fontSize}" style="width:100%;accent-color:var(--accent);" oninput="updateSetting('fontSize', parseInt(this.value))">
+
+        <div class="menu-section-label" style="margin-top:16px;">Behavior</div>
+        <label style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;font-size:14px;">
+          <span>Left-Handed Mode</span>
+          <input type="checkbox" ${Settings.leftHanded ? 'checked' : ''} onchange="updateSetting('leftHanded', this.checked)">
+        </label>
+        <label style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;font-size:14px;">
+          <span>Dim Inactive Blocks</span>
+          <input type="checkbox" ${Settings.dimOtherBlocks ? 'checked' : ''} onchange="updateSetting('dimOtherBlocks', this.checked)">
+        </label>
+
+        <div class="menu-section-label" style="margin-top:16px;">Data</div>
+        <button class="menu-row" onclick="exportAllProjectsJson()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span>Export All Projects Backup</span>
+        </button>
+        <button class="menu-row danger" onclick="clearAllTrashPermanently()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          <span>Empty Trash</span>
+        </button>
+      `;
+
+      openSheet('Settings', body);
+    }
+
+    function updateSetting(key, val) {
+      Settings[key] = val;
+      saveGlobalSettings();
+      renderEditor();
+    }
+
+    // ==========================================================================
+    // LEVEL 1: HOME CONTROLLER
+    // ==========================================================================
+    function getProjectList() {
+      try {
+        const raw = localStorage.getItem(INDEX_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveProjectList(list) {
+      localStorage.setItem(INDEX_KEY, JSON.stringify(list));
+    }
+
+    function renderHome() {
+      const projects = getProjectList();
+      const listEl = document.getElementById('home-projects-list');
+      const emptyEl = document.getElementById('home-empty-state');
+      const searchInput = document.getElementById('home-search-input');
+      const sortSelect = document.getElementById('home-sort-select');
+      const recentChips = document.getElementById('recent-chips-bar');
+
+      const query = (searchInput.value || '').toLowerCase().trim();
+      const sort = sortSelect.value;
+
+      let filtered = projects.filter(p => !p.archived && !p.inTrash);
+      if (query) {
+        filtered = filtered.filter(p => (p.title || '').toLowerCase().includes(query) || (p.logline || '').toLowerCase().includes(query));
+      }
+
+      if (sort === 'name') filtered.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
+      else if (sort === 'created') filtered.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+      else filtered.sort((a, b) => (b.lastEdited || 0) - (a.lastEdited || 0));
+
+      if (filtered.length > 3) {
+        recentChips.style.display = 'flex';
+        recentChips.innerHTML = filtered.slice(0, 4).map(p => `
+          <button class="recent-chip" onclick="openProject('${p.id}')">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            <span>${escapeHtml(p.title)}</span>
+          </button>
+        `).join('');
+      } else {
+        recentChips.style.display = 'none';
+      }
+
+      document.getElementById('archive-count').textContent = projects.filter(p => p.archived).length;
+      document.getElementById('trash-count').textContent = projects.filter(p => p.inTrash).length;
+
+      if (!filtered.length && !query) {
+        listEl.innerHTML = '';
+        emptyEl.style.display = 'flex';
+        return;
+      }
+
+      emptyEl.style.display = 'none';
+      listEl.innerHTML = '';
+
+      filtered.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'project-card';
+        card.dataset.id = p.id;
+
+        const dateStr = p.lastEdited ? new Date(p.lastEdited).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : 'Draft';
+        const sceneLabel = plural(p.sceneCount || 0, 'scene');
+        const dotsHtml = (p.charColors || []).map(c => `<span class="char-dot" style="background:${c};"></span>`).join('');
+
+        let progressPercent = 0;
+        let showProgress = false;
+        if (p.targetWords && p.currentWords) {
+          progressPercent = Math.min(100, Math.round((p.currentWords / p.targetWords) * 100));
+          showProgress = true;
+        }
+
+        card.innerHTML = `
+          <div class="project-card-header">
+            <h2 class="project-card-title">${escapeHtml(p.title || 'Untitled Story')}</h2>
+            <span class="format-pill">${escapeHtml(p.format || 'Feature')}</span>
+          </div>
+          ${showProgress ? `<div class="card-goal-line" style="display:block;"><div class="card-goal-fill" style="width:${progressPercent}%;"></div></div>` : ''}
+          <div class="project-card-meta">
+            <span>${sceneLabel} • ${dateStr}</span>
+            <div class="project-dots-row">${dotsHtml}</div>
+          </div>
+        `;
+
+        card.onclick = () => openProject(p.id);
+        card.oncontextmenu = (e) => {
+          e.preventDefault();
+          openProjectOptionsSheet(p);
+        };
+
+        listEl.appendChild(card);
+      });
+    }
+
+    function openProjectOptionsSheet(projectMeta) {
+      const body = `
+        <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px;">${escapeHtml(projectMeta.title)}</div>
+        <button class="menu-row" id="m-proj-rename">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          <span>Rename Story</span>
+        </button>
+        <button class="menu-row" id="m-proj-duplicate">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <span>Duplicate as New Draft</span>
+        </button>
+        <button class="menu-row" id="m-proj-archive">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+          <span>Archive Story</span>
+        </button>
+        <button class="menu-row danger" id="m-proj-delete">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          <span>Move to Trash</span>
+        </button>
+      `;
+
+      openSheet('Story Actions', body);
+
+      document.getElementById('m-proj-rename').onclick = () => {
+        closeSheet();
+        const nt = prompt('Rename project:', projectMeta.title);
+        if (nt && nt.trim()) {
+          projectMeta.title = nt.trim();
+          updateProjectMeta(projectMeta);
+          const full = loadProjectData(projectMeta.id);
+          if (full) {
+            full.title = nt.trim();
+            saveProjectData(full);
+          }
+          renderHome();
+        }
+      };
+
+      document.getElementById('m-proj-duplicate').onclick = () => {
+        closeSheet();
+        const full = loadProjectData(projectMeta.id);
+        if (full) {
+          const dupId = 'proj_' + Date.now();
+          const dup = JSON.parse(JSON.stringify(full));
+          dup.id = dupId;
+          dup.title = full.title + ' (Draft ' + ((full.draftNumber || 1) + 1) + ')';
+          saveProjectData(dup);
+
+          const list = getProjectList();
+          list.push({
+            id: dupId,
+            title: dup.title,
+            format: projectMeta.format,
+            logline: projectMeta.logline,
+            sceneCount: dup.scenes.length,
+            charColors: projectMeta.charColors,
+            createdAt: Date.now(),
+            lastEdited: Date.now()
+          });
+          saveProjectList(list);
+          renderHome();
+        }
+      };
+
+      document.getElementById('m-proj-archive').onclick = () => {
+        closeSheet();
+        projectMeta.archived = true;
+        updateProjectMeta(projectMeta);
+        renderHome();
+      };
+
+      document.getElementById('m-proj-delete').onclick = () => {
+        closeSheet();
+        projectMeta.inTrash = true;
+        updateProjectMeta(projectMeta);
+        renderHome();
+        showUndoToast('Story moved to Trash', () => {
+          projectMeta.inTrash = false;
+          updateProjectMeta(projectMeta);
+          renderHome();
+        });
+      };
+    }
+
+    function openNewProjectSheet() {
+      const body = `
+        <div class="input-label">Project Title</div>
+        <input class="text-input" id="new-proj-title" placeholder="e.g. Neon Convergence" autofocus>
+
+        <div class="input-label" style="margin-top:10px;">Format</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button class="icon-btn-sm active" style="width:auto;padding:0 12px;" data-format="Feature">Feature</button>
+          <button class="icon-btn-sm" style="width:auto;padding:0 12px;" data-format="Short film">Short film</button>
+          <button class="icon-btn-sm" style="width:auto;padding:0 12px;" data-format="Series episode">Series episode</button>
+          <button class="icon-btn-sm" style="width:auto;padding:0 12px;" data-format="Blank">Blank</button>
+        </div>
+
+        <div class="input-label" style="margin-top:10px;">Template</div>
+        <select class="select-input" id="new-proj-template">
+          <option value="blank">Blank Script</option>
+          <option value="3act">Three-Act Classic</option>
+          <option value="save_cat">Save the Cat (15 Beats)</option>
+          <option value="hero">Hero's Journey</option>
+          <option value="short5">Short Film (5 Beats)</option>
+        </select>
+
+        <button class="btn-primary" style="margin-top:16px;" id="btn-confirm-create-project">Create Project</button>
+      `;
+
+      openSheet('New Project', body);
+
+      let selectedFormat = 'Feature';
+      document.querySelectorAll('.icon-btn-sm[data-format]').forEach(btn => {
+        btn.onclick = () => {
+          document.querySelectorAll('.icon-btn-sm[data-format]').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          selectedFormat = btn.dataset.format;
+        };
+      });
+
+      document.getElementById('btn-confirm-create-project').onclick = () => {
+        const title = document.getElementById('new-proj-title').value.trim() || 'Untitled Story';
+        const template = document.getElementById('new-proj-template').value;
+        const projId = 'proj_' + Date.now();
+
+        const newProj = buildProjectWithStructure(projId, title, selectedFormat, '', template);
+        saveProjectData(newProj);
+
+        const list = getProjectList();
+        list.push({
+          id: projId,
+          title,
+          format: selectedFormat,
+          sceneCount: newProj.scenes.length,
+          charColors: newProj.characters.map(c => c.color),
+          createdAt: Date.now(),
+          lastEdited: Date.now()
+        });
+        saveProjectList(list);
+
+        closeSheet();
+        renderHome();
+        openProject(projId);
+      };
+    }
+
+    function buildProjectWithStructure(id, title, format, logline, template) {
+      const leadChar = { id: 'char_lead', name: 'PROTAGONIST', color: PRESET_COLORS[1], role: 'Lead', bio: '', age: '' };
+      const locMain = { id: 'loc_main', name: 'MAIN LOCATION', type: 'INT.', notes: '', color: PRESET_COLORS[4] };
+
+      const proj = {
+        id,
+        title,
+        format,
+        logline,
+        author: 'Screenwriter',
+        scenes: [],
+        blocks: {},
+        characters: [leadChar],
+        locations: [locMain],
+        researchNotes: [],
+        ideasInbox: [],
+        versions: [],
+        trash: { blocks: [], scenes: [] },
+        goals: { targetWords: 15000, targetPages: 60 },
+        historyDays: {},
+        createdAt: Date.now(),
+        lastEdited: Date.now()
+      };
+
+      let beats = ['Opening Image'];
+      if (template === '3act') beats = ['Act I Setup', 'Act II Midpoint', 'Act III Climax'];
+      else if (template === 'save_cat') beats = ['1. Opening Image', '2. Catalyst', '3. Break into Two', '4. Midpoint', '5. All Hope Is Lost', '6. Finale'];
+      else if (template === 'short5') beats = ['1. Status Quo', '2. Disturbance', '3. Pursuit', '4. Climax', '5. New Normal'];
+
+      beats.forEach((bName, idx) => {
+        const scId = 'sc_' + (idx + 1) + '_' + Date.now();
+        const hId = 'b_h_' + (idx + 1) + '_' + Date.now();
+        const aId = 'b_a_' + (idx + 1) + '_' + Date.now();
+
+        proj.scenes.push({
+          id: scId,
+          number: idx + 1,
+          title: bName,
+          status: 'Idea',
+          locationId: 'loc_main',
+          timeOfDay: 'DAY',
+          summary: `Beat outline: ${bName}`,
+          blockIds: [hId, aId]
+        });
+
+        proj.blocks[hId] = { id: hId, sceneId: scId, type: 'heading', intExt: 'INT.', locationId: 'loc_main', timeOfDay: 'DAY', hidden: false };
+        proj.blocks[aId] = { id: aId, sceneId: scId, type: 'action', content: `${bName.toUpperCase()}: `, hidden: false };
+      });
+
+      return proj;
+    }
+
+    function loadSampleNeonProject() {
+      const sample = createInitialSampleProject();
+      saveProjectData(sample);
+
+      const list = getProjectList();
+      const existing = list.findIndex(p => p.id === sample.id);
+      const meta = {
+        id: sample.id,
+        title: sample.title,
+        format: 'Short film',
+        sceneCount: sample.scenes.length,
+        charColors: sample.characters.map(c => c.color),
+        createdAt: Date.now(),
+        lastEdited: Date.now()
+      };
+
+      if (existing > -1) list[existing] = meta;
+      else list.unshift(meta);
+
+      saveProjectList(list);
+      renderHome();
+      openProject(sample.id);
+    }
+
+    function updateProjectMeta(meta) {
+      const list = getProjectList();
+      const idx = list.findIndex(p => p.id === meta.id);
+      if (idx > -1) {
+        list[idx] = meta;
+        saveProjectList(list);
+      }
+    }
+
+    // ==========================================================================
+    // LEVEL 2: EDITOR CONTROLLER
+    // ==========================================================================
+    function loadProjectData(id) {
+      try {
+        const raw = localStorage.getItem('scene_stack_proj_' + id);
+        return raw ? JSON.parse(raw) : null;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function saveProjectData(proj) {
+      if (!proj) return;
+      proj.lastEdited = Date.now();
+
+      const todayStr = new Date().toISOString().slice(0, 10);
+      if (!proj.historyDays) proj.historyDays = {};
+      let totalWords = 0;
+      Object.values(proj.blocks).forEach(b => {
+        if (!b.hidden && b.content) totalWords += b.content.trim().split(/\s+/).filter(Boolean).length;
+      });
+      proj.historyDays[todayStr] = (proj.historyDays[todayStr] || 0) + 1;
+
+      localStorage.setItem('scene_stack_proj_' + proj.id, JSON.stringify(proj));
+
+      const list = getProjectList();
+      const m = list.find(p => p.id === proj.id);
+      if (m) {
+        m.title = proj.title;
+        m.sceneCount = proj.scenes.length;
+        m.charColors = (proj.characters || []).map(c => c.color);
+        m.currentWords = totalWords;
+        m.targetWords = proj.goals?.targetWords;
+        m.lastEdited = proj.lastEdited;
+        saveProjectList(list);
+      }
+    }
+
+    function openProject(id) {
+      let data = loadProjectData(id);
+      if (!data) {
+        data = createInitialSampleProject();
+        data.id = id;
+        saveProjectData(data);
+      }
+
+      ActiveProjectId = id;
+      CurrentProject = data;
+      HistoryStack = [];
+      HistoryIndex = -1;
+      recordHistorySnapshot('Opened project');
+
+      document.getElementById('screen-home').classList.remove('active');
+      document.getElementById('screen-editor').classList.add('active');
+      CurrentScreen = 'editor';
+
+      document.getElementById('editor-project-title').textContent = CurrentProject.title || 'Untitled Story';
+      renderEditor();
+    }
+
+    function closeEditorToHome() {
+      if (CurrentProject) saveProjectData(CurrentProject);
+      if (SprintTimerInterval) clearInterval(SprintTimerInterval);
+      if (SpeechSynth) SpeechSynth.cancel();
+
+      CurrentScreen = 'home';
+      document.getElementById('screen-editor').classList.remove('active');
+      document.getElementById('screen-home').classList.add('active');
+      renderHome();
+    }
+
+    function applyOperation(op, isUndoRedo = false) {
+      if (!CurrentProject) return;
+
+      if (!isUndoRedo && HistoryIndex < HistoryStack.length - 1) {
+        HistoryStack = HistoryStack.slice(0, HistoryIndex + 1);
+      }
+
+      switch (op.type) {
+        case 'UPDATE_TITLE':
+          CurrentProject.title = op.title;
+          document.getElementById('editor-project-title').textContent = op.title;
+          break;
+
+        case 'UPDATE_BLOCK_CONTENT':
+          if (CurrentProject.blocks[op.blockId]) {
+            CurrentProject.blocks[op.blockId].content = op.content;
+          }
+          break;
+
+        case 'CHANGE_BLOCK_TYPE':
+          if (CurrentProject.blocks[op.blockId]) {
+            CurrentProject.blocks[op.blockId].type = op.newType;
+            if (op.newType === 'dialogue' && !CurrentProject.blocks[op.blockId].characterId) {
+              CurrentProject.blocks[op.blockId].characterId = CurrentProject.characters[0]?.id || '';
+            }
+          }
+          break;
+
+        case 'ADD_BLOCK': {
+          CurrentProject.blocks[op.block.id] = op.block;
+          const sc = CurrentProject.scenes.find(s => s.id === op.sceneId);
+          if (sc) {
+            const idx = op.afterBlockId ? sc.blockIds.indexOf(op.afterBlockId) + 1 : sc.blockIds.length;
+            sc.blockIds.splice(idx, 0, op.block.id);
+          }
+          break;
+        }
+
+        case 'DELETE_BLOCK': {
+          const b = CurrentProject.blocks[op.blockId];
+          if (b) {
+            const sc = CurrentProject.scenes.find(s => s.id === b.sceneId);
+            if (sc) {
+              const idx = sc.blockIds.indexOf(op.blockId);
+              if (idx > -1) sc.blockIds.splice(idx, 1);
+            }
+            if (!CurrentProject.trash.blocks) CurrentProject.trash.blocks = [];
+            CurrentProject.trash.blocks.push({ block: b, sceneId: b.sceneId, deletedAt: Date.now() });
+            delete CurrentProject.blocks[op.blockId];
+          }
+          break;
+        }
+
+        case 'TOGGLE_HIDE_BLOCK':
+          if (CurrentProject.blocks[op.blockId]) {
+            CurrentProject.blocks[op.blockId].hidden = !CurrentProject.blocks[op.blockId].hidden;
+          }
+          break;
+
+        case 'SPLIT_SCENE': {
+          const oldScene = CurrentProject.scenes.find(s => s.id === op.sceneId);
+          if (oldScene) {
+            const splitIdx = oldScene.blockIds.indexOf(op.blockId);
+            if (splitIdx > -1) {
+              const movingBlocks = oldScene.blockIds.splice(splitIdx);
+              const newSceneId = 'sc_' + Date.now();
+              const newScene = {
+                id: newSceneId,
+                number: oldScene.number + 1,
+                title: oldScene.title + ' (Part 2)',
+                locationId: oldScene.locationId,
+                timeOfDay: oldScene.timeOfDay,
+                status: oldScene.status,
+                blockIds: movingBlocks
+              };
+              movingBlocks.forEach(bId => {
+                if (CurrentProject.blocks[bId]) CurrentProject.blocks[bId].sceneId = newSceneId;
+              });
+              const oldSceneIdx = CurrentProject.scenes.indexOf(oldScene);
+              CurrentProject.scenes.splice(oldSceneIdx + 1, 0, newScene);
+              CurrentProject.scenes.forEach((s, i) => s.number = i + 1);
+            }
+          }
+          break;
+        }
+
+        case 'UPDATE_CHARACTER': {
+          const c = CurrentProject.characters.find(ch => ch.id === op.character.id);
+          if (c) Object.assign(c, op.character);
+          else CurrentProject.characters.push(op.character);
+          break;
+        }
+
+        case 'UPDATE_LOCATION': {
+          const l = CurrentProject.locations.find(loc => loc.id === op.location.id);
+          if (l) Object.assign(l, op.location);
+          else CurrentProject.locations.push(op.location);
+          break;
+        }
+
+        case 'SET_PROJECT_STATE':
+          CurrentProject = JSON.parse(JSON.stringify(op.state));
+          break;
+      }
+
+      if (!isUndoRedo) {
+        recordHistorySnapshot(op.description || op.type);
+      }
+
+      saveProjectData(CurrentProject);
+      renderEditor();
+    }
+
+    function recordHistorySnapshot(description) {
+      if (!CurrentProject) return;
+      HistoryStack.push({
+        description,
+        timestamp: Date.now(),
+        state: JSON.stringify(CurrentProject)
+      });
+      HistoryIndex = HistoryStack.length - 1;
+    }
+
+    function undo() {
+      if (HistoryIndex > 0) {
+        HistoryIndex--;
+        CurrentProject = JSON.parse(HistoryStack[HistoryIndex].state);
+        saveProjectData(CurrentProject);
+        renderEditor();
+      }
+    }
+
+    function redo() {
+      if (HistoryIndex < HistoryStack.length - 1) {
+        HistoryIndex++;
+        CurrentProject = JSON.parse(HistoryStack[HistoryIndex].state);
+        saveProjectData(CurrentProject);
+        renderEditor();
+      }
+    }
+
+    // ==========================================================================
+    // EDITOR RENDERING (WRITE, BOARD, SHOTS, CAST)
+    // ==========================================================================
+    function renderEditor() {
+      if (!CurrentProject) return;
+
+      const goalBar = document.getElementById('topbar-goal-bar');
+      const goalFill = document.getElementById('topbar-goal-fill');
+      let currentWords = 0;
+      Object.values(CurrentProject.blocks).forEach(b => {
+        if (!b.hidden && b.content) currentWords += b.content.trim().split(/\s+/).filter(Boolean).length;
+      });
+      if (CurrentProject.goals?.targetWords) {
+        goalBar.style.display = 'block';
+        const pct = Math.min(100, Math.round((currentWords / CurrentProject.goals.targetWords) * 100));
+        goalFill.style.width = pct + '%';
+      } else {
+        goalBar.style.display = 'none';
+      }
+
+      const activeSc = CurrentProject.scenes[0];
+      if (activeSc) {
+        const loc = CurrentProject.locations.find(l => l.id === activeSc.locationId);
+        document.getElementById('sticky-scene-text').textContent = `SCENE ${activeSc.number}: ${loc?.type || 'EXT.'} ${loc?.name || 'LOCATION'} - ${activeSc.timeOfDay || 'DAY'}`;
+      }
+
+      document.querySelectorAll('.tab-pane').forEach(p => p.style.display = 'none');
+      const activePane = document.getElementById('pane-' + ActiveTab);
+      if (activePane) activePane.style.display = 'block';
+
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === ActiveTab);
+      });
+
+      if (ActiveTab === 'write') renderWriteView();
+      else if (ActiveTab === 'board') renderBoardView();
+      else if (ActiveTab === 'shots') renderShotsView();
+      else if (ActiveTab === 'cast') renderCastView();
+    }
+
+    // WRITE VIEW RENDER
+    function renderWriteView() {
+      const container = document.getElementById('script-flow-container');
+      container.className = 'script-flow' + (ScreenplayFormat ? ' screenplay-mode' : '');
+      container.innerHTML = '';
+
+      CurrentProject.scenes.forEach(scene => {
+        const scWrap = document.createElement('div');
+        scWrap.className = 'scene-wrap';
+        scWrap.id = 'sc-wrap-' + scene.id;
+
+        scene.blockIds.forEach(bId => {
+          const block = CurrentProject.blocks[bId];
+          if (!block) return;
+          if (block.type === 'shot' && Settings.showShotBlocks === 'hidden') return;
+
+          const blockEl = createScriptBlockElement(block, scene);
+          scWrap.appendChild(blockEl);
+        });
+
+        container.appendChild(scWrap);
+      });
+    }
+
+    function createScriptBlockElement(block, scene) {
+      const el = document.createElement('div');
+      el.className = `script-block ${block.type}` +
+        (SelectedBlockId === block.id ? ' selected' : '') +
+        (block.hidden ? ' muted-block' : '');
+      el.dataset.id = block.id;
+
+      if (FocusCharacterId) {
+        if (block.type === 'dialogue' && block.characterId !== FocusCharacterId) el.classList.add('dimmed');
+        else if (block.type !== 'dialogue') el.classList.add('dimmed');
+      }
+
+      let speakerChar = null;
+      if (block.type === 'dialogue') {
+        speakerChar = CurrentProject.characters.find(c => c.id === block.characterId) || CurrentProject.characters[0];
+        if (speakerChar) el.style.borderLeftColor = speakerChar.color || '#C97B7B';
+      }
+
+      let contentHtml = '';
+      if (block.type === 'heading') {
+        const loc = CurrentProject.locations.find(l => l.id === block.locationId);
+        contentHtml = `
+          <div class="block-heading-text">
+            <span>SCENE ${scene.number}: ${loc?.type || 'EXT.'} ${loc?.name || 'LOCATION'} - ${block.timeOfDay || 'DAY'}</span>
+          </div>
+        `;
+      } else if (block.type === 'action') {
+        contentHtml = `<div class="block-action-text">${escapeHtml(block.content || 'Action beat...')}</div>`;
+      } else if (block.type === 'dialogue') {
+        contentHtml = `
+          <div class="dialogue-speaker-name" style="color:${speakerChar?.color || 'var(--text)'};">
+            <span>${escapeHtml(speakerChar?.name || 'CHARACTER')}</span>
+            ${block.extension ? `<span style="font-size:11px;color:var(--text-muted);font-weight:400;">(${block.extension})</span>` : ''}
+          </div>
+          ${block.parenthetical ? `<div class="block-parenthetical-text">${escapeHtml(block.parenthetical)}</div>` : ''}
+          <div class="dialogue-text">${escapeHtml(block.content || 'Dialogue line...')}</div>
+        `;
+      } else if (block.type === 'parenthetical') {
+        contentHtml = `<div class="block-parenthetical-text">${escapeHtml(block.content || '(parenthetical)')}</div>`;
+      } else if (block.type === 'shot') {
+        contentHtml = `
+          <div class="block-shot-text">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            <span>CAMERA: ${block.size || 'CU'} • ${block.angle || 'Eye-level'} • ${block.movement || 'Static'}</span>
+            ${block.notes ? `<span style="font-weight:400;color:var(--text-muted);">(${escapeHtml(block.notes)})</span>` : ''}
+          </div>
+        `;
+      } else if (block.type === 'transition') {
+        contentHtml = `<div class="block-transition-text">${escapeHtml(block.content || 'CUT TO:')}</div>`;
+      } else if (block.type === 'sound_cue') {
+        contentHtml = `<div class="block-sound-text">${escapeHtml(block.content || 'SFX: SOUND CUE')}</div>`;
+      } else if (block.type === 'note') {
+        contentHtml = `<div class="block-note-text">${escapeHtml(block.content || 'Private note')}</div>`;
+      }
+
+      if (block.comment) {
+        contentHtml += `
+          <div class="block-comment-indicator">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <span>${escapeHtml(block.comment)}</span>
+          </div>
+        `;
+      }
+
+      // LINE-ICON ACTION BAR (APPEARS ON SELECTED BLOCK)
+      const actionRow = document.createElement('div');
+      actionRow.className = 'block-action-row';
+      actionRow.innerHTML = `
+        <button class="icon-btn-sm" title="Change Block Type" onclick="event.stopPropagation(); openBlockTypePicker('${block.id}')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        </button>
+
+        ${block.type === 'dialogue' ? `
+          <button class="icon-btn-sm" title="Voice Extension (V.O., O.S., CONT'D)" onclick="event.stopPropagation(); cycleSpeakerExtension('${block.id}')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </button>
+          <button class="icon-btn-sm" title="Assign Speaker" onclick="event.stopPropagation(); openSpeakerPicker('${block.id}')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </button>
+        ` : ''}
+
+        ${block.type === 'shot' ? `
+          <button class="icon-btn-sm" title="Camera Coverage & Angle" onclick="event.stopPropagation(); openShotSheet('${block.id}')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          </button>
+        ` : ''}
+
+        <button class="icon-btn-sm" title="${block.hidden ? 'Unmute Block' : 'Mute Block'}" onclick="event.stopPropagation(); toggleHideBlock('${block.id}')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+            ${block.hidden
+              ? '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>'
+              : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>'}
+          </svg>
+        </button>
+
+        <button class="icon-btn-sm" title="Duplicate Block" onclick="event.stopPropagation(); duplicateBlock('${block.id}')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
+
+        <button class="icon-btn-sm" title="Add Private Comment" onclick="event.stopPropagation(); addBlockComment('${block.id}')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        </button>
+
+        <button class="icon-btn-sm" title="Split Scene Here" onclick="event.stopPropagation(); splitSceneAtBlock('${scene.id}', '${block.id}')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>
+        </button>
+
+        <button class="icon-btn-sm danger" title="Delete Block" onclick="event.stopPropagation(); deleteBlock('${block.id}')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        </button>
+      `;
+
+      el.innerHTML = contentHtml;
+      el.appendChild(actionRow);
+
+      el.onclick = () => {
+        if (SelectedBlockId !== block.id) {
+          SelectedBlockId = block.id;
+          renderWriteView();
+          showEditToolbar(block);
+        } else {
+          startInlineEditing(el, block, scene);
+        }
+      };
+
+      return el;
+    }
+
+    function startInlineEditing(el, block, scene) {
+      if (el.querySelector('textarea')) return;
+
+      const textarea = document.createElement('textarea');
+      textarea.className = 'block-textarea';
+      textarea.value = block.content || block.notes || '';
+
+      const textNode = el.querySelector('.block-action-text, .dialogue-text, .block-parenthetical-text, .block-transition-text, .block-sound-text, .block-note-text');
+      if (textNode) textNode.replaceWith(textarea);
+      else el.insertBefore(textarea, el.querySelector('.block-action-row'));
+
+      textarea.focus();
+      textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+      autoResizeTextarea(textarea);
+
+      textarea.oninput = () => {
+        autoResizeTextarea(textarea);
+        let val = textarea.value;
+
+        if (Settings.autoCapitalizeHeadings && (block.type === 'heading' || block.type === 'transition')) {
+          val = val.toUpperCase();
+        }
+
+        if (block.type === 'shot') block.notes = val;
+        else block.content = val;
+
+        saveProjectData(CurrentProject);
+      };
+
+      textarea.onkeydown = (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          handleEnterPredict(block, scene);
+        }
+      };
+
+      showEditToolbar(block);
+    }
+
+    function autoResizeTextarea(ta) {
+      ta.style.height = 'auto';
+      ta.style.height = ta.scrollHeight + 'px';
+    }
+
+    function handleEnterPredict(block, scene) {
+      let nextType = 'action';
+      if (block.type === 'heading') nextType = 'action';
+      else if (block.type === 'action') nextType = 'action';
+      else if (block.type === 'dialogue') nextType = 'action';
+      else if (block.type === 'parenthetical') nextType = 'dialogue';
+
+      const newBlock = {
+        id: 'b_' + Date.now(),
+        sceneId: scene.id,
+        type: nextType,
+        content: '',
+        hidden: false
+      };
+      if (nextType === 'dialogue') {
+        newBlock.characterId = CurrentProject.characters[0]?.id || '';
+      }
+
+      applyOperation({
+        type: 'ADD_BLOCK',
+        sceneId: scene.id,
+        afterBlockId: block.id,
+        block: newBlock,
+        description: 'Added ' + nextType
+      });
+
+      SelectedBlockId = newBlock.id;
+      renderWriteView();
+
+      setTimeout(() => {
+        const nextEl = document.querySelector(`[data-id="${newBlock.id}"]`);
+        if (nextEl) startInlineEditing(nextEl, newBlock, scene);
+      }, 50);
+    }
+
+    function showEditToolbar(block) {
+      const tb = document.getElementById('block-edit-toolbar');
+      tb.classList.add('active');
+
+      document.querySelectorAll('.tool-chip').forEach(c => {
+        c.classList.toggle('active', c.dataset.type === block.type);
+        c.onclick = () => {
+          applyOperation({
+            type: 'CHANGE_BLOCK_TYPE',
+            blockId: block.id,
+            newType: c.dataset.type,
+            description: 'Converted to ' + c.dataset.type
+          });
+          renderWriteView();
+        };
+      });
+    }
+
+    function hideEditToolbar() {
+      document.getElementById('block-edit-toolbar').classList.remove('active');
+    }
+
+    function toggleHideBlock(blockId) {
+      applyOperation({ type: 'TOGGLE_HIDE_BLOCK', blockId, description: 'Mute toggle' });
+    }
+
+    function duplicateBlock(blockId) {
+      const orig = CurrentProject.blocks[blockId];
+      if (!orig) return;
+      const dup = JSON.parse(JSON.stringify(orig));
+      dup.id = 'b_' + Date.now();
+      applyOperation({ type: 'ADD_BLOCK', sceneId: orig.sceneId, afterBlockId: orig.id, block: dup, description: 'Duplicated block' });
+    }
+
+    function deleteBlock(blockId) {
+      applyOperation({ type: 'DELETE_BLOCK', blockId, description: 'Deleted block' });
+      showUndoToast('Block moved to Trash', undo);
+    }
+
+    function splitSceneAtBlock(sceneId, blockId) {
+      applyOperation({ type: 'SPLIT_SCENE', sceneId, blockId, description: 'Split scene' });
+      showUndoToast('Scene split into two');
+    }
+
+    function cycleSpeakerExtension(blockId) {
+      const b = CurrentProject.blocks[blockId];
+      if (!b) return;
+      const exts = ['', 'V.O.', 'O.S.', "CONT'D", 'INTO PHONE'];
+      const curIdx = exts.indexOf(b.extension || '');
+      b.extension = exts[(curIdx + 1) % exts.length];
+      saveProjectData(CurrentProject);
+      renderWriteView();
+    }
+
+    function addBlockComment(blockId) {
+      const b = CurrentProject.blocks[blockId];
+      if (!b) return;
+      const comm = prompt('Add private comment on block:', b.comment || '');
+      if (comm !== null) {
+        b.comment = comm.trim();
+        saveProjectData(CurrentProject);
+        renderWriteView();
+      }
+    }
+
+    function openBlockTypePicker(blockId) {
+      const types = [
+        { id: 'heading', name: 'Scene Heading', icon: '<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/>' },
+        { id: 'action', name: 'Action Beat', icon: '<line x1="17" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="17" y1="18" x2="3" y2="18"/>' },
+        { id: 'dialogue', name: 'Dialogue', icon: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>' },
+        { id: 'parenthetical', name: 'Parenthetical', icon: '<path d="M8 4c-3 4-3 12 0 16"/><path d="M16 4c3 4 3 12 0 16"/>' },
+        { id: 'shot', name: 'Camera Shot', icon: '<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>' },
+        { id: 'transition', name: 'Transition', icon: '<polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/>' },
+        { id: 'sound_cue', name: 'Sound Cue / SFX', icon: '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>' },
+        { id: 'note', name: 'Private Note', icon: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>' }
+      ];
+      const rowsHtml = types.map(t => `
+        <button class="menu-row" onclick="changeBlockType('${blockId}','${t.id}')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">${t.icon}</svg>
+          <span>${t.name}</span>
+        </button>
+      `).join('');
+      openSheet('Convert Block Type', rowsHtml);
+    }
+
+    function changeBlockType(blockId, newType) {
+      closeSheet();
+      applyOperation({ type: 'CHANGE_BLOCK_TYPE', blockId, newType, description: 'Converted to ' + newType });
+    }
+
+    function openSpeakerPicker(blockId) {
+      const rows = CurrentProject.characters.map(c => `
+        <button class="menu-row" onclick="setBlockSpeaker('${blockId}','${c.id}')">
+          <span class="char-dot" style="background:${c.color};width:12px;height:12px;"></span>
+          <span>${escapeHtml(c.name)}</span>
+        </button>
+      `).join('');
+      openSheet('Select Speaker', rows);
+    }
+
+    function setBlockSpeaker(blockId, charId) {
+      closeSheet();
+      const b = CurrentProject.blocks[blockId];
+      if (b) {
+        b.characterId = charId;
+        saveProjectData(CurrentProject);
+        renderWriteView();
+      }
+    }
+
+    // ==========================================================================
+    // BINDER & STRUCTURE
+    // ==========================================================================
+    function openBinderDrawer() {
+      const tree = document.getElementById('binder-tree-content');
+      tree.innerHTML = '';
+
+      const scriptHeader = document.createElement('div');
+      scriptHeader.className = 'binder-section-title';
+      scriptHeader.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span>Script / Scenes</span>`;
+      tree.appendChild(scriptHeader);
+
+      CurrentProject.scenes.forEach(scene => {
+        const loc = CurrentProject.locations.find(l => l.id === scene.locationId);
+        const row = document.createElement('div');
+        row.className = 'binder-item';
+        row.innerHTML = `
+          <span class="status-dot" style="background:${getStatusColor(scene.status)};"></span>
+          <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Sc. ${scene.number}: ${loc?.name || scene.title}</span>
+          <span style="font-size:11px;color:var(--text-faint);">${plural(scene.blockIds.length, 'block')}</span>
+        `;
+        row.onclick = () => {
+          closeBinderDrawer();
+          ActiveTab = 'write';
+          renderEditor();
+          const el = document.getElementById('sc-wrap-' + scene.id);
+          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        };
+        tree.appendChild(row);
+      });
+
+      const resHeader = document.createElement('div');
+      resHeader.className = 'binder-section-title';
+      resHeader.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg><span>Research & Notes</span>`;
+      tree.appendChild(resHeader);
+
+      (CurrentProject.researchNotes || []).forEach(note => {
+        const row = document.createElement('div');
+        row.className = 'binder-item';
+        row.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg><span style="flex:1;">${escapeHtml(note.title)}</span>`;
+        row.onclick = () => {
+          closeBinderDrawer();
+          openReferenceSplitView(note);
+        };
+        tree.appendChild(row);
+      });
+
+      const addNoteRow = document.createElement('button');
+      addNoteRow.className = 'icon-btn-sm';
+      addNoteRow.style.width = '100%';
+      addNoteRow.style.margin = '6px 0';
+      addNoteRow.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span style="font-size:12px;margin-left:6px;">Add Research Note</span>`;
+      addNoteRow.onclick = createResearchNote;
+      tree.appendChild(addNoteRow);
+
+      document.getElementById('binder-backdrop').classList.add('open');
+      document.getElementById('binder-drawer').classList.add('open');
+    }
+
+    function closeBinderDrawer() {
+      document.getElementById('binder-backdrop').classList.remove('open');
+      document.getElementById('binder-drawer').classList.remove('open');
+    }
+
+    function getStatusColor(status) {
+      if (status === 'Final') return 'var(--success)';
+      if (status === 'Revised') return 'var(--warning)';
+      if (status === 'Draft') return 'var(--info)';
+      return 'var(--text-faint)';
+    }
+
+    function createResearchNote() {
+      const title = prompt('Research note title:');
+      if (title && title.trim()) {
+        const text = prompt('Note body or reference link:');
+        if (!CurrentProject.researchNotes) CurrentProject.researchNotes = [];
+        CurrentProject.researchNotes.push({ id: 'rn_' + Date.now(), title: title.trim(), text: text || '' });
+        saveProjectData(CurrentProject);
+        openBinderDrawer();
+      }
+    }
+
+    function openReferenceSplitView(note) {
+      const pane = document.getElementById('split-ref-pane');
+      document.getElementById('split-ref-title').textContent = note.title;
+      document.getElementById('split-ref-content').textContent = note.text;
+      pane.classList.add('open');
+    }
+
+    function quickCaptureIdea() {
+      const idea = prompt('Quick Capture Idea (saved to Binder):');
+      if (idea && idea.trim()) {
+        if (!CurrentProject.ideasInbox) CurrentProject.ideasInbox = [];
+        CurrentProject.ideasInbox.unshift({ id: 'id_' + Date.now(), text: idea.trim(), date: Date.now() });
+        saveProjectData(CurrentProject);
+        showUndoToast('Idea captured in Binder');
+      }
+    }
+
+    // ==========================================================================
+    // BOARD VIEW
+    // ==========================================================================
+    function renderBoardView() {
+      const container = document.getElementById('board-container');
+      const filter = document.getElementById('board-filter-select').value;
+      container.innerHTML = '';
+
+      let matchingScenes = CurrentProject.scenes;
+      if (filter !== 'all') matchingScenes = matchingScenes.filter(s => s.status === filter);
+
+      document.getElementById('board-scene-count-label').textContent = plural(matchingScenes.length, 'scene');
+
+      matchingScenes.forEach(scene => {
+        const card = document.createElement('div');
+        card.className = 'board-scene-card';
+
+        const loc = CurrentProject.locations.find(l => l.id === scene.locationId);
+        const heading = `${loc?.type || 'EXT.'} ${loc?.name || 'LOCATION'} - ${scene.timeOfDay || 'DAY'}`;
+
+        const charDots = [];
+        scene.blockIds.forEach(bId => {
+          const b = CurrentProject.blocks[bId];
+          if (b && b.type === 'dialogue' && b.characterId) {
+            const ch = CurrentProject.characters.find(c => c.id === b.characterId);
+            if (ch && !charDots.includes(ch.color)) charDots.push(ch.color);
+          }
+        });
+        const dotsHtml = charDots.map(c => `<span class="char-dot" style="background:${c};"></span>`).join('');
+
+        let scWords = 0;
+        scene.blockIds.forEach(bId => {
+          const b = CurrentProject.blocks[bId];
+          if (b && b.content) scWords += b.content.split(/\s+/).length;
+        });
+        const estMin = Math.max(1, Math.round(scWords / 150));
+
+        card.innerHTML = `
+          <div class="board-scene-top">
+            <span class="board-scene-title">
+              <span class="status-dot" style="background:${getStatusColor(scene.status)};"></span>
+              Scene ${scene.number}
+            </span>
+            <span class="format-pill">${escapeHtml(scene.status || 'Draft')}</span>
+          </div>
+          <div style="font-size:13px;font-weight:600;color:var(--text);">${escapeHtml(heading)}</div>
+          <div class="board-scene-summary">${escapeHtml(scene.summary || 'Tap to edit synopsis...')}</div>
+          <div class="board-scene-footer">
+            <span>~${estMin} min • ${plural(scene.blockIds.length, 'block')}</span>
+            <div class="project-dots-row">${dotsHtml}</div>
+          </div>
+        `;
+
+        card.onclick = () => openSceneEditSheet(scene);
+        container.appendChild(card);
+      });
+    }
+
+    function openSceneEditSheet(scene) {
+      const body = `
+        <div class="input-label">Scene Title</div>
+        <input class="text-input" id="sc-edit-title" value="${scene.title || ''}">
+
+        <div class="input-label" style="margin-top:10px;">Status</div>
+        <select class="select-input" id="sc-edit-status">
+          <option value="Idea" ${scene.status === 'Idea' ? 'selected' : ''}>Idea</option>
+          <option value="Draft" ${scene.status === 'Draft' ? 'selected' : ''}>Draft</option>
+          <option value="Revised" ${scene.status === 'Revised' ? 'selected' : ''}>Revised</option>
+          <option value="Final" ${scene.status === 'Final' ? 'selected' : ''}>Final</option>
+        </select>
+
+        <div class="input-label" style="margin-top:10px;">Synopsis / Summary</div>
+        <textarea class="textarea-input" id="sc-edit-summary" rows="3">${scene.summary || ''}</textarea>
+
+        <button class="btn-primary" style="margin-top:14px;" onclick="closeSheet()">Save Scene</button>
+      `;
+
+      openSheet('Scene ' + scene.number + ' Settings', body);
+
+      document.getElementById('sc-edit-title').oninput = (e) => {
+        scene.title = e.target.value;
+        saveProjectData(CurrentProject);
+      };
+      document.getElementById('sc-edit-status').onchange = (e) => {
+        scene.status = e.target.value;
+        saveProjectData(CurrentProject);
+        renderBoardView();
+      };
+      document.getElementById('sc-edit-summary').oninput = (e) => {
+        scene.summary = e.target.value;
+        saveProjectData(CurrentProject);
+      };
+    }
+
+    // ==========================================================================
+    // SHOTS VIEW
+    // ==========================================================================
+    function renderShotsView() {
+      const container = document.getElementById('shots-container');
+      container.innerHTML = '';
+
+      let totalShots = 0;
+      CurrentProject.scenes.forEach(scene => {
+        const shotBlocks = scene.blockIds
+          .map(bId => CurrentProject.blocks[bId])
+          .filter(b => b && b.type === 'shot');
+
+        if (!shotBlocks.length) return;
+
+        const group = document.createElement('div');
+        group.className = 'shot-group';
+        group.innerHTML = `
+          <div class="shot-group-header">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            <span>Scene ${scene.number} (${plural(shotBlocks.length, 'shot')})</span>
+          </div>
+        `;
+
+        shotBlocks.forEach(sb => {
+          totalShots++;
+          const row = document.createElement('div');
+          row.className = 'shot-row';
+          row.innerHTML = `
+            <span class="shot-num">#${totalShots}</span>
+            <span class="shot-pill-tag">${sb.size || 'CU'}</span>
+            <span class="shot-pill-tag">${sb.angle || 'Eye-level'}</span>
+            <span class="shot-desc">${escapeHtml(sb.notes || 'Coverage shot')}</span>
+          `;
+          row.onclick = () => openShotSheet(sb.id);
+          group.appendChild(row);
+        });
+
+        container.appendChild(group);
+      });
+
+      if (!totalShots) {
+        container.innerHTML = `
+          <div class="empty-state" style="min-height:30vh;">
+            <p class="empty-state-sub">No camera shot blocks added yet.</p>
+          </div>
+        `;
+      }
+    }
+
+    function openShotSheet(blockId) {
+      const block = CurrentProject.blocks[blockId];
+      if (!block) return;
+
+      const body = `
+        <div class="input-label">Shot Size</div>
+        <select class="select-input" id="shot-size-sel">
+          ${['ECU', 'CU', 'MCU', 'MS', 'MLS', 'LS', 'ELS'].map(s => `<option value="${s}" ${block.size === s ? 'selected' : ''}>${s}</option>`).join('')}
+        </select>
+
+        <div class="input-label" style="margin-top:10px;">Angle</div>
+        <select class="select-input" id="shot-angle-sel">
+          ${['Eye-level', 'Low', 'High', 'Dutch', "Bird's eye", "Worm's eye", 'OTS', 'POV'].map(a => `<option value="${a}" ${block.angle === a ? 'selected' : ''}>${a}</option>`).join('')}
+        </select>
+
+        <div class="input-label" style="margin-top:10px;">Movement</div>
+        <select class="select-input" id="shot-mov-sel">
+          ${['Static', 'Pan', 'Tilt', 'Dolly', 'Tracking', 'Handheld', 'Crane', 'Zoom'].map(m => `<option value="${m}" ${block.movement === m ? 'selected' : ''}>${m}</option>`).join('')}
+        </select>
+
+        <div class="input-label" style="margin-top:10px;">Framing Notes</div>
+        <textarea class="textarea-input" id="shot-notes-input" rows="2">${block.notes || ''}</textarea>
+
+        <button class="btn-primary" style="margin-top:14px;" onclick="closeSheet()">Done</button>
+      `;
+
+      openSheet('Camera Shot Coverage', body);
+
+      document.getElementById('shot-size-sel').onchange = (e) => {
+        block.size = e.target.value;
+        saveProjectData(CurrentProject);
+      };
+      document.getElementById('shot-angle-sel').onchange = (e) => {
+        block.angle = e.target.value;
+        saveProjectData(CurrentProject);
+      };
+      document.getElementById('shot-mov-sel').onchange = (e) => {
+        block.movement = e.target.value;
+        saveProjectData(CurrentProject);
+      };
+      document.getElementById('shot-notes-input').oninput = (e) => {
+        block.notes = e.target.value;
+        saveProjectData(CurrentProject);
+      };
+    }
+
+    // ==========================================================================
+    // CAST VIEW
+    // ==========================================================================
+    function renderCastView() {
+      const container = document.getElementById('cast-entities-container');
+      container.innerHTML = '';
+
+      if (ActiveCastSegment === 'characters') {
+        const linesCount = {};
+        let totalLines = 0;
+        CurrentProject.characters.forEach(c => linesCount[c.id] = 0);
+
+        Object.values(CurrentProject.blocks).forEach(b => {
+          if (b.type === 'dialogue' && b.characterId && linesCount[b.characterId] !== undefined) {
+            linesCount[b.characterId]++;
+            totalLines++;
+          }
+        });
+
+        CurrentProject.characters.forEach(char => {
+          const charLines = linesCount[char.id] || 0;
+          const sharePct = totalLines > 0 ? Math.round((charLines / totalLines) * 100) : 0;
+
+          const row = document.createElement('div');
+          row.className = 'entity-row';
+          row.innerHTML = `
+            <div class="entity-avatar" style="background:${char.color};">${char.name.charAt(0)}</div>
+            <div class="entity-info">
+              <div class="entity-name">${escapeHtml(char.name)}</div>
+              <div class="entity-sub">${escapeHtml(char.role || 'Character')} ${char.age ? '• Age ' + char.age : ''}</div>
+            </div>
+            <span style="font-size:12px;color:var(--text-faint);">${plural(charLines, 'line')} (${sharePct}%)</span>
+          `;
+          row.onclick = () => openCharacterSheet(char);
+          container.appendChild(row);
+        });
+      } else if (ActiveCastSegment === 'locations') {
+        CurrentProject.locations.forEach(loc => {
+          const row = document.createElement('div');
+          row.className = 'entity-row';
+          row.innerHTML = `
+            <div class="entity-avatar" style="background:${loc.color};color:#fff;">${loc.type.charAt(0)}</div>
+            <div class="entity-info">
+              <div class="entity-name">${escapeHtml(loc.type)} ${escapeHtml(loc.name)}</div>
+              <div class="entity-sub">${escapeHtml(loc.notes || 'No notes.')}</div>
+            </div>
+          `;
+          row.onclick = () => openLocationSheet(loc);
+          container.appendChild(row);
+        });
+      } else {
+        renderPresenceMatrix(container);
+      }
+    }
+
+    function renderPresenceMatrix(container) {
+      let html = `<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:12px;"><thead><tr><th style="text-align:left;padding:8px;">Character</th>`;
+      CurrentProject.scenes.forEach(s => html += `<th style="padding:8px;">Sc.${s.number}</th>`);
+      html += `</tr></thead><tbody>`;
+
+      CurrentProject.characters.forEach(c => {
+        html += `<tr><td style="padding:8px;font-weight:700;color:${c.color};">${escapeHtml(c.name)}</td>`;
+        CurrentProject.scenes.forEach(s => {
+          const present = s.blockIds.some(bId => {
+            const b = CurrentProject.blocks[bId];
+            return b && b.type === 'dialogue' && b.characterId === c.id;
+          });
+          html += `<td style="text-align:center;padding:8px;">${present ? '●' : '—'}</td>`;
+        });
+        html += `</tr>`;
+      });
+      html += `</tbody></table></div>`;
+      container.innerHTML = html;
+    }
+
+    function openCharacterSheet(char) {
+      const isNew = !char.id;
+      const c = char.id ? char : { id: 'char_' + Date.now(), name: 'NEW CHARACTER', color: PRESET_COLORS[0], role: 'Supporting', bio: '', age: '' };
+
+      const swatchesHtml = PRESET_COLORS.map(col => `
+        <span class="color-swatch ${c.color === col ? 'active' : ''}" style="background:${col};width:28px;height:28px;border-radius:50%;cursor:pointer;display:inline-block;" onclick="selectCharColor('${col}')"></span>
+      `).join('');
+
+      const body = `
+        <div class="input-label">Character Name (Small Caps / Uppercase)</div>
+        <input class="text-input" id="c-name" value="${c.name}">
+
+        <div class="input-label" style="margin-top:10px;">Accent Color</div>
+        <div style="display:flex;gap:8px;margin-bottom:8px;">${swatchesHtml}</div>
+
+        <div class="input-label">Role</div>
+        <input class="text-input" id="c-role" value="${c.role || ''}">
+
+        <div class="input-label" style="margin-top:10px;">Character Notes / Arc</div>
+        <textarea class="textarea-input" id="c-bio" rows="2">${c.bio || ''}</textarea>
+
+        <div style="display:flex;gap:10px;margin-top:14px;">
+          <button class="btn-primary" id="btn-save-character">Save Character</button>
+          <button class="btn-secondary" id="btn-focus-character">Focus Lines</button>
+        </div>
+      `;
+
+      openSheet(isNew ? 'New Character' : 'Edit Character', body);
+
+      window.selectCharColor = (col) => {
+        c.color = col;
+        openCharacterSheet(c);
+      };
+
+      document.getElementById('btn-save-character').onclick = () => {
+        c.name = document.getElementById('c-name').value.toUpperCase().trim() || 'CHARACTER';
+        c.role = document.getElementById('c-role').value.trim();
+        c.bio = document.getElementById('c-bio').value.trim();
+
+        applyOperation({ type: 'UPDATE_CHARACTER', character: c, description: 'Updated ' + c.name });
+        closeSheet();
+      };
+
+      document.getElementById('btn-focus-character').onclick = () => {
+        closeSheet();
+        FocusCharacterId = c.id;
+        document.getElementById('focus-banner').style.display = 'flex';
+        document.getElementById('focus-banner-text').textContent = 'Focusing: ' + c.name;
+        ActiveTab = 'write';
+        renderEditor();
+      };
+    }
+
+    function openLocationSheet(loc) {
+      const isNew = !loc.id;
+      const l = loc.id ? loc : { id: 'loc_' + Date.now(), name: 'NEW LOCATION', type: 'INT.', notes: '', color: PRESET_COLORS[4] };
+
+      const body = `
+        <div class="input-label">Type</div>
+        <select class="select-input" id="loc-type">
+          <option value="INT." ${l.type === 'INT.' ? 'selected' : ''}>INT.</option>
+          <option value="EXT." ${l.type === 'EXT.' ? 'selected' : ''}>EXT.</option>
+          <option value="INT./EXT." ${l.type === 'INT./EXT.' ? 'selected' : ''}>INT./EXT.</option>
+        </select>
+
+        <div class="input-label" style="margin-top:10px;">Location Name</div>
+        <input class="text-input" id="loc-name" value="${l.name}">
+
+        <div class="input-label" style="margin-top:10px;">Atmosphere / Visual Notes</div>
+        <textarea class="textarea-input" id="loc-notes" rows="3">${l.notes || ''}</textarea>
+
+        <button class="btn-primary" style="margin-top:14px;" id="btn-save-loc">Save Location</button>
+      `;
+
+      openSheet(isNew ? 'New Location' : 'Edit Location', body);
+
+      document.getElementById('btn-save-loc').onclick = () => {
+        l.type = document.getElementById('loc-type').value;
+        l.name = document.getElementById('loc-name').value.toUpperCase().trim() || 'LOCATION';
+        l.notes = document.getElementById('loc-notes').value.trim();
+
+        applyOperation({ type: 'UPDATE_LOCATION', location: l, description: 'Updated ' + l.name });
+        closeSheet();
+      };
+    }
+
+    // ==========================================================================
+    // STORY MENU WITH LINE ICONS
+    // ==========================================================================
+    function openStoryMenu() {
+      let words = 0, lines = 0;
+      Object.values(CurrentProject.blocks).forEach(b => {
+        if (!b.hidden && b.content) {
+          words += b.content.trim().split(/\s+/).filter(Boolean).length;
+          lines += Math.max(1, b.content.split('\n').length);
+        }
+      });
+      const pages = Math.max(1, Math.round((lines / 50 + words / 220) / 2 * 10) / 10);
+      const estMin = Math.floor(pages);
+      const estSec = Math.round((pages - estMin) * 60);
+
+      const body = `
+        <div style="font-size:12px;color:var(--text-muted);padding-bottom:10px;border-bottom:1px solid var(--border);">
+          ${words.toLocaleString()} words • ${plural(pages, 'page')} • ~${estMin}m ${estSec}s runtime
+        </div>
+
+        <div class="menu-section-label">Edit</div>
+        <div style="display:flex;gap:8px;">
+          <button class="icon-btn-sm" style="flex:1;height:42px;" id="m-undo" ${HistoryIndex <= 0 ? 'disabled' : ''}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+            <span style="font-size:13px;margin-left:6px;">Undo</span>
+          </button>
+          <button class="icon-btn-sm" style="flex:1;height:42px;" id="m-redo" ${HistoryIndex >= HistoryStack.length - 1 ? 'disabled' : ''}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            <span style="font-size:13px;margin-left:6px;">Redo</span>
+          </button>
+        </div>
+
+        <div class="menu-section-label">View & Focus</div>
+        <button class="menu-row" id="m-toggle-format">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          <span>${ScreenplayFormat ? 'Switch to Block Mode' : 'Switch to Courier Format'}</span>
+        </button>
+        <button class="menu-row" id="m-toggle-focus">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+          <span>Focus Mode (Distraction-Free)</span>
+        </button>
+
+        <div class="menu-section-label">Structure & Tools</div>
+        <button class="menu-row" id="m-open-binder">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          <span>Binder & Research</span>
+        </button>
+        <button class="menu-row" id="m-quick-capture">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+          <span>Quick Capture Idea</span>
+        </button>
+        <button class="menu-row" id="m-table-read">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+          <span>Table Read (Speech)</span>
+        </button>
+        <button class="menu-row" id="m-check-consistency">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          <span>Consistency Checker</span>
+        </button>
+
+        <div class="menu-section-label">Export</div>
+        <button class="menu-row" id="m-export-print">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          <span>Print / Save PDF</span>
+        </button>
+        <button class="menu-row" id="m-export-fountain">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/></svg>
+          <span>Fountain Script (.fountain)</span>
+        </button>
+        <button class="menu-row" id="m-export-json">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span>Save Backup (.json)</span>
+        </button>
+
+        <div class="menu-section-label">Settings & Exit</div>
+        <button class="menu-row" id="m-settings">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span>Settings</span>
+        </button>
+        <button class="menu-row danger" id="m-close">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <span>Close Project</span>
+        </button>
+      `;
+
+      openSheet('Story Menu', body);
+
+      document.getElementById('m-undo').onclick = () => { closeSheet(); undo(); };
+      document.getElementById('m-redo').onclick = () => { closeSheet(); redo(); };
+      document.getElementById('m-toggle-format').onclick = () => { closeSheet(); ScreenplayFormat = !ScreenplayFormat; renderWriteView(); };
+      document.getElementById('m-toggle-focus').onclick = () => { closeSheet(); enterFocusMode(); };
+      document.getElementById('m-open-binder').onclick = () => { closeSheet(); openBinderDrawer(); };
+      document.getElementById('m-quick-capture').onclick = () => { closeSheet(); quickCaptureIdea(); };
+      document.getElementById('m-table-read').onclick = () => { closeSheet(); startTableRead(); };
+      document.getElementById('m-check-consistency').onclick = () => { closeSheet(); runConsistencyChecker(); };
+      document.getElementById('m-export-print').onclick = () => { closeSheet(); exportPrint(); };
+      document.getElementById('m-export-fountain').onclick = () => { closeSheet(); exportFountain(); };
+      document.getElementById('m-export-json').onclick = () => { closeSheet(); exportJsonBackup(); };
+      document.getElementById('m-settings').onclick = () => { closeSheet(); openFullSettingsSheet(); };
+      document.getElementById('m-close').onclick = () => { closeSheet(); closeEditorToHome(); };
+    }
+
+    function enterFocusMode() {
+      document.body.classList.add('focus-mode-active');
+      showUndoToast('Focus mode active. Tap top edge to exit.');
+    }
+    function exitFocusMode() {
+      document.body.classList.remove('focus-mode-active');
+    }
+
+    function startTableRead() {
+      if (!SpeechSynth) {
+        alert('Web Speech API is not supported.');
+        return;
+      }
+      SpeechSynth.cancel();
+      SpeechUtterances = [];
+      SpeechCurrentIndex = 0;
+
+      CurrentProject.scenes.forEach(scene => {
+        scene.blockIds.forEach(bId => {
+          const b = CurrentProject.blocks[bId];
+          if (!b || b.hidden) return;
+          if (b.type === 'dialogue') {
+            const ch = CurrentProject.characters.find(c => c.id === b.characterId);
+            const u = new SpeechSynthesisUtterance(b.content);
+            u.pitch = ch ? (ch.id === 'char_void' ? 0.7 : 1.1) : 1.0;
+            SpeechUtterances.push({ utt: u, label: ch ? ch.name : 'Character' });
+          } else if (b.type === 'action') {
+            const u = new SpeechSynthesisUtterance(b.content);
+            u.pitch = 0.9;
+            SpeechUtterances.push({ utt: u, label: 'Action' });
+          }
+        });
+      });
+
+      if (!SpeechUtterances.length) return;
+      document.getElementById('speech-player-bar').classList.add('active');
+      playNextSpeech();
+    }
+
+    function playNextSpeech() {
+      if (SpeechCurrentIndex >= SpeechUtterances.length) {
+        stopTableRead();
+        return;
+      }
+      const item = SpeechUtterances[SpeechCurrentIndex];
+      document.getElementById('speech-current-speaker').textContent = item.label;
+
+      item.utt.onend = () => {
+        SpeechCurrentIndex++;
+        playNextSpeech();
+      };
+      SpeechSynth.speak(item.utt);
+    }
+
+    function stopTableRead() {
+      if (SpeechSynth) SpeechSynth.cancel();
+      document.getElementById('speech-player-bar').classList.remove('active');
+    }
+
+    function runConsistencyChecker() {
+      const issues = [];
+      CurrentProject.scenes.forEach(scene => {
+        const loc = CurrentProject.locations.find(l => l.id === scene.locationId);
+        if (!loc) issues.push(`Scene ${scene.number}: Unknown location.`);
+        let hasHeading = false;
+        scene.blockIds.forEach(bId => {
+          const b = CurrentProject.blocks[bId];
+          if (b && b.type === 'heading') hasHeading = true;
+          if (b && b.type === 'dialogue' && !b.characterId) issues.push(`Scene ${scene.number}: Dialogue missing speaker.`);
+        });
+        if (!hasHeading) issues.push(`Scene ${scene.number}: No slugline heading.`);
+      });
+
+      const body = issues.length
+        ? issues.map(i => `<div class="menu-row" style="color:var(--warning);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span>${escapeHtml(i)}</span></div>`).join('')
+        : `<div style="text-align:center;padding:20px;color:var(--success);">✓ Everything is consistent! Locations, headings, and character lines are aligned.</div>`;
+
+      openSheet('Consistency Checker', body);
+    }
+
+    function exportPrint() {
+      if (window.AndroidBridge && window.AndroidBridge.printDocument) {
+        window.AndroidBridge.printDocument(CurrentProject.title || 'Screenplay');
+      } else {
+        window.print();
+      }
+    }
+
+    function exportFountain() {
+      let f = `Title: ${CurrentProject.title}\nAuthor: ${CurrentProject.author || ''}\n\n`;
+      CurrentProject.scenes.forEach(scene => {
+        scene.blockIds.forEach(bId => {
+          const b = CurrentProject.blocks[bId];
+          if (!b || b.hidden) return;
+          if (b.type === 'heading') {
+            const l = CurrentProject.locations.find(loc => loc.id === b.locationId);
+            f += `\n.${l?.type || 'EXT.'} ${l?.name || 'LOCATION'} - ${b.timeOfDay || 'DAY'}\n\n`;
+          } else if (b.type === 'action') f += `${b.content}\n\n`;
+          else if (b.type === 'dialogue') {
+            const ch = CurrentProject.characters.find(c => c.id === b.characterId);
+            f += `${ch?.name || 'SPEAKER'}\n${b.content}\n\n`;
+          } else if (b.type === 'transition') f += `> ${b.content}\n\n`;
+        });
+      });
+      triggerDownload(f, (CurrentProject.title || 'screenplay') + '.fountain', 'text/plain');
+    }
+
+    function exportJsonBackup() {
+      triggerDownload(JSON.stringify(CurrentProject, null, 2), (CurrentProject.title || 'backup') + '.json', 'application/json');
+    }
+
+    function exportAllProjectsJson() {
+      const list = getProjectList();
+      const all = {};
+      list.forEach(m => {
+        const p = loadProjectData(m.id);
+        if (p) all[m.id] = p;
+      });
+      triggerDownload(JSON.stringify(all, null, 2), 'scenestack_all_projects_backup.json', 'application/json');
+    }
+
+    function triggerDownload(content, filename, mime) {
+      if (window.AndroidBridge && window.AndroidBridge.shareText && mime.startsWith('text/')) {
+        window.AndroidBridge.shareText(filename, content);
+      }
+      const blob = new Blob([content], { type: mime });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function showUndoToast(msg, onUndo) {
+      const box = document.getElementById('toast-box');
+      document.getElementById('toast-message').textContent = msg;
+      const undoBtn = document.getElementById('toast-undo-btn');
+
+      if (onUndo) {
+        undoBtn.style.display = 'inline-block';
+        undoBtn.onclick = () => { onUndo(); box.classList.remove('show'); };
+      } else {
+        undoBtn.style.display = 'none';
+      }
+
+      box.classList.add('show');
+      setTimeout(() => box.classList.remove('show'), 5000);
+    }
+
+    function jumpToScene(sceneId) {
+      closeSheet();
+      ActiveTab = 'write';
+      renderEditor();
+      setTimeout(() => {
+        const el = document.getElementById('sc-wrap-' + sceneId);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 50);
+    }
+
+    function openSceneJumpDropdown() {
+      const rows = CurrentProject.scenes.map(s => {
+        const loc = CurrentProject.locations.find(l => l.id === s.locationId);
+        return `
+          <button class="menu-row" onclick="jumpToScene('${s.id}')">
+            <span class="status-dot" style="background:${getStatusColor(s.status)};"></span>
+            <span>Sc. ${s.number}: ${escapeHtml(loc?.name || s.title)}</span>
+          </button>
+        `;
+      }).join('');
+      openSheet('Jump to Scene', rows);
+    }
+
+    function openSheet(title, bodyHtml) {
+      document.getElementById('sheet-title').textContent = title;
+      document.getElementById('sheet-body').innerHTML = bodyHtml;
+      document.getElementById('sheet-backdrop').classList.add('open');
+    }
+
+    function closeSheet() {
+      document.getElementById('sheet-backdrop').classList.remove('open');
+    }
+
+    function setupKeyboardViewport() {
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', () => {
+          const vv = window.visualViewport;
+          const kb = Math.max(0, window.innerHeight - vv.height);
+          const tb = document.getElementById('block-edit-toolbar');
+          if (tb) tb.style.bottom = kb > 20 ? (kb + 'px') : 'calc(var(--tab-height) + var(--safe-bottom))';
+        });
+      }
+    }
+
+    function setupScrollFabFade() {
+      const ws = document.getElementById('editor-workspace');
+      const fab = document.getElementById('btn-fab-editor-add');
+      let timeout;
+      ws.addEventListener('scroll', () => {
+        fab.classList.add('scrolling');
+        clearTimeout(timeout);
+        timeout = setTimeout(() => fab.classList.remove('scrolling'), 300);
+      }, { passive: true });
+    }
+
+    function checkFirstUseTips() {
+      if (!localStorage.getItem('scene_stack_tip_dismissed')) {
+        document.getElementById('home-onboarding-tip').style.display = 'flex';
+      }
+    }
+
+    function setupGlobalListeners() {
+      document.getElementById('btn-home-settings').onclick = openFullSettingsSheet;
+      document.getElementById('home-search-input').oninput = renderHome;
+      document.getElementById('home-sort-select').onchange = renderHome;
+      document.getElementById('btn-fab-new-project').onclick = openNewProjectSheet;
+      document.getElementById('btn-empty-new').onclick = openNewProjectSheet;
+      document.getElementById('btn-load-sample').onclick = loadSampleNeonProject;
+      document.getElementById('btn-dismiss-tip').onclick = () => {
+        document.getElementById('home-onboarding-tip').style.display = 'none';
+        localStorage.setItem('scene_stack_tip_dismissed', '1');
+      };
+
+      document.getElementById('btn-editor-back').onclick = closeEditorToHome;
+      document.getElementById('btn-topbar-undo').onclick = undo;
+      document.getElementById('btn-topbar-redo').onclick = redo;
+      document.getElementById('btn-editor-menu').onclick = openStoryMenu;
+      document.getElementById('btn-sticky-scene-jump').onclick = openSceneJumpDropdown;
+      document.getElementById('btn-topbar-speech').onclick = startTableRead;
+      document.getElementById('btn-open-binder').onclick = openBinderDrawer;
+      document.getElementById('btn-close-binder').onclick = closeBinderDrawer;
+      document.getElementById('binder-backdrop').onclick = (e) => {
+        if (e.target === document.getElementById('binder-backdrop')) closeBinderDrawer();
+      };
+      document.getElementById('btn-open-search').onclick = openFindAndReplace;
+      document.getElementById('focus-exit-trigger').onclick = exitFocusMode;
+      document.getElementById('btn-exit-focus').onclick = () => {
+        FocusCharacterId = null;
+        document.getElementById('focus-banner').style.display = 'none';
+        renderEditor();
+      };
+
+      let fabTimer = null;
+      const fab = document.getElementById('btn-fab-editor-add');
+      fab.addEventListener('touchstart', () => {
+        fabTimer = setTimeout(() => {
+          quickCaptureIdea();
+          fabTimer = null;
+        }, 600);
+      }, { passive: true });
+      fab.addEventListener('touchend', () => {
+        if (fabTimer) clearTimeout(fabTimer);
+      }, { passive: true });
+
+      fab.onclick = () => {
+        if (ActiveTab === 'write') {
+          const sc = CurrentProject.scenes[0];
+          if (sc) handleEnterPredict(CurrentProject.blocks[sc.blockIds[sc.blockIds.length - 1]], sc);
+        } else if (ActiveTab === 'cast') {
+          if (ActiveCastSegment === 'characters') openCharacterSheet({});
+          else openLocationSheet({});
+        }
+      };
+
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.onclick = () => {
+          ActiveTab = btn.dataset.tab;
+          hideEditToolbar();
+          renderEditor();
+        };
+      });
+
+      let tabTimer = null;
+      const writeTab = document.getElementById('tab-btn-write');
+      writeTab.addEventListener('touchstart', () => {
+        tabTimer = setTimeout(enterFocusMode, 700);
+      }, { passive: true });
+      writeTab.addEventListener('touchend', () => {
+        if (tabTimer) clearTimeout(tabTimer);
+      }, { passive: true });
+
+      document.getElementById('seg-characters').onclick = () => {
+        ActiveCastSegment = 'characters';
+        document.querySelectorAll('.segment-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('seg-characters').classList.add('active');
+        renderCastView();
+      };
+      document.getElementById('seg-locations').onclick = () => {
+        ActiveCastSegment = 'locations';
+        document.querySelectorAll('.segment-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('seg-locations').classList.add('active');
+        renderCastView();
+      };
+      document.getElementById('seg-presence').onclick = () => {
+        ActiveCastSegment = 'presence';
+        document.querySelectorAll('.segment-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('seg-presence').classList.add('active');
+        renderCastView();
+      };
+
+      document.getElementById('btn-speech-toggle').onclick = () => {
+        if (SpeechSynth.paused) {
+          SpeechSynth.resume();
+        } else {
+          SpeechSynth.pause();
+        }
+      };
+      document.getElementById('btn-speech-stop').onclick = stopTableRead;
+
+      document.getElementById('btn-close-split').onclick = () => {
+        document.getElementById('split-ref-pane').classList.remove('open');
+      };
+
+      document.getElementById('btn-sheet-close').onclick = closeSheet;
+      document.getElementById('sheet-backdrop').onclick = (e) => {
+        if (e.target === document.getElementById('sheet-backdrop')) closeSheet();
+      };
+
+      window.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+          e.preventDefault();
+          if (e.shiftKey) redo();
+          else undo();
+        } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') {
+          e.preventDefault();
+          redo();
+        } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+          e.preventDefault();
+          openCommandPalette();
+        }
+      });
+    }
+
+    function openCommandPalette() {
+      const backdrop = document.getElementById('cmd-backdrop');
+      const input = document.getElementById('cmd-input');
+      const list = document.getElementById('cmd-list');
+
+      backdrop.classList.add('open');
+      input.value = '';
+      input.focus();
+
+      const commands = [
+        { label: 'Jump to Write View', action: () => { ActiveTab = 'write'; renderEditor(); } },
+        { label: 'Jump to Board View', action: () => { ActiveTab = 'board'; renderEditor(); } },
+        { label: 'Jump to Shots View', action: () => { ActiveTab = 'shots'; renderEditor(); } },
+        { label: 'Open Binder', action: openBinderDrawer },
+        { label: 'Start Focus Mode', action: enterFocusMode },
+        { label: 'Table Read (Speech)', action: startTableRead },
+        { label: 'Consistency Checker', action: runConsistencyChecker },
+        { label: 'Export Screenplay (PDF)', action: exportPrint },
+        { label: 'Export Fountain File', action: exportFountain }
+      ];
+
+      function renderCmds(q) {
+        list.innerHTML = '';
+        const filtered = commands.filter(c => c.label.toLowerCase().includes(q.toLowerCase()));
+        filtered.forEach(c => {
+          const btn = document.createElement('button');
+          btn.className = 'menu-row';
+          btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="9 18 15 12 9 6"/></svg><span>${c.label}</span>`;
+          btn.onclick = () => {
+            backdrop.classList.remove('open');
+            c.action();
+          };
+          list.appendChild(btn);
+        });
+      }
+      renderCmds('');
+      input.oninput = () => renderCmds(input.value);
+
+      backdrop.onclick = (e) => {
+        if (e.target === backdrop) backdrop.classList.remove('open');
+      };
+    }
+
+    function openFindAndReplace() {
+      const body = `
+        <div class="input-label">Find Text</div>
+        <input class="text-input" id="far-find">
+
+        <div class="input-label" style="margin-top:10px;">Replace With</div>
+        <input class="text-input" id="far-replace">
+
+        <button class="btn-primary" style="margin-top:16px;" id="btn-far-exec">Replace All</button>
+      `;
+      openSheet('Find and Replace', body);
+
+      document.getElementById('btn-far-exec').onclick = () => {
+        const findStr = document.getElementById('far-find').value;
+        const repStr = document.getElementById('far-replace').value;
+        if (!findStr) return;
+
+        let matchCount = 0;
+        Object.values(CurrentProject.blocks).forEach(b => {
+          if (b.content && b.content.includes(findStr)) {
+            b.content = b.content.split(findStr).join(repStr);
+            matchCount++;
+          }
+        });
+        saveProjectData(CurrentProject);
+        closeSheet();
+        renderEditor();
+        showUndoToast(`Replaced ${plural(matchCount, 'instance')}`);
+      };
+    }
+
+    function clearAllTrashPermanently() {
+      if (confirm('Permanently empty all trash across all projects?')) {
+        const list = getProjectList();
+        list.forEach(m => {
+          const p = loadProjectData(m.id);
+          if (p && p.trash) {
+            p.trash = { blocks: [], scenes: [] };
+            saveProjectData(p);
+          }
+        });
+        closeSheet();
+        showUndoToast('Trash emptied');
+      }
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function createInitialSampleProject() {
+      const charMaya = { id: 'char_maya', name: 'MAYA', color: PRESET_COLORS[1], role: 'Detective', age: '34', bio: 'Disillusioned cybernetic detective.' };
+      const charVoid = { id: 'char_void', name: 'VOID', color: PRESET_COLORS[4], role: 'Broker', age: 'Unknown', bio: 'Holographic entity.' };
+      const locAlley = { id: 'loc_alley', name: 'NEON RAIN ALLEY', type: 'EXT.', color: PRESET_COLORS[5] };
+      const locSafehouse = { id: 'loc_safehouse', name: 'MAYA\'S SAFEHOUSE', type: 'INT.', color: PRESET_COLORS[3] };
+      const locRooftop = { id: 'loc_rooftop', name: 'SECTOR 4 TOWER', type: 'EXT.', color: PRESET_COLORS[7] };
+
+      return {
+        id: 'sample_neon_convergence',
+        title: 'NEON CONVERGENCE',
+        format: 'Short film',
+        logline: 'A cynical cybernetic detective recovers an encrypted chip in the rain-drenched underworld.',
+        author: 'Screenwriter',
+        scenes: [
+          {
+            id: 'scene_1',
+            number: 1,
+            locationId: 'loc_alley',
+            timeOfDay: 'NIGHT',
+            title: 'The Dead Drop',
+            status: 'Revised',
+            summary: 'Maya recovers a shattered neural chip while avoiding corp patrol drones.',
+            blockIds: ['b1', 'b2', 'b3', 'b4', 'b5', 'b6', 'b7']
+          },
+          {
+            id: 'scene_2',
+            number: 2,
+            locationId: 'loc_safehouse',
+            timeOfDay: 'LATER',
+            title: 'Decryption',
+            status: 'Draft',
+            summary: 'Maya plugs the chip into her antique deck; Void materializes with a warning.',
+            blockIds: ['b8', 'b9', 'b10', 'b11']
+          },
+          {
+            id: 'scene_3',
+            number: 3,
+            locationId: 'loc_rooftop',
+            timeOfDay: 'DAWN',
+            title: 'Signal Flare',
+            status: 'Idea',
+            summary: 'A standoff at the broadcast relay as sirens echo across the city.',
+            blockIds: ['b12', 'b13', 'b14']
+          }
+        ],
+        blocks: {
+          b1: { id: 'b1', sceneId: 'scene_1', type: 'heading', locationId: 'loc_alley', timeOfDay: 'NIGHT' },
+          b2: { id: 'b2', sceneId: 'scene_1', type: 'shot', size: 'ELS', angle: 'High', movement: 'Dolly', notes: 'Establishing neon billboards reflected in puddles.' },
+          b3: { id: 'b3', sceneId: 'scene_1', type: 'action', content: 'Acid rain slants across ferro-concrete walls. A glowing cigarette burns in the shadow of a rusted dumpster.' },
+          b4: { id: 'b4', sceneId: 'scene_1', type: 'dialogue', characterId: 'char_maya', content: 'Ten seconds until the thermal scan cycles. Don\'t make me wait.' },
+          b5: { id: 'b5', sceneId: 'scene_1', type: 'sound_cue', content: 'SFX: DISTANT ENFORCER SIRENS WAIL' },
+          b6: { id: 'b6', sceneId: 'scene_1', type: 'shot', size: 'CU', angle: 'Low', movement: 'Pan', notes: 'Tracks up her mechanical arm.' },
+          b7: { id: 'b7', sceneId: 'scene_1', type: 'transition', content: 'SMASH CUT TO:' },
+
+          b8: { id: 'b8', sceneId: 'scene_2', type: 'heading', locationId: 'loc_safehouse', timeOfDay: 'LATER' },
+          b9: { id: 'b9', sceneId: 'scene_2', type: 'action', content: 'A battered coffee pot bubbles on an induction plate. Maya inserts the frosted glass chip into an ancient console terminal.' },
+          b10: { id: 'b10', sceneId: 'scene_2', type: 'dialogue', characterId: 'char_void', extension: 'V.O.', content: 'You shouldn\'t have cracked that seal, Detective.' },
+          b11: { id: 'b11', sceneId: 'scene_2', type: 'note', content: 'Maya stays calm, taking a slow sip before answering.' },
+
+          b12: { id: 'b12', sceneId: 'scene_3', type: 'heading', locationId: 'loc_rooftop', timeOfDay: 'DAWN' },
+          b13: { id: 'b13', sceneId: 'scene_3', type: 'action', content: 'A fierce sea-wind cuts the high mist. Below, millions of speeders glide in crimson flight-lanes.' },
+          b14: { id: 'b14', sceneId: 'scene_3', type: 'dialogue', characterId: 'char_maya', content: 'Let them come. We are broadcasting the raw feeds now.' }
+        },
+        characters: [charMaya, charVoid],
+        locations: [locAlley, locSafehouse, locRooftop],
+        researchNotes: [
+          { id: 'rn_1', title: 'Cybernetics Specs', text: 'Model: Titan-7 hydraulic servo forearm with titanium casing.' }
+        ],
+        ideasInbox: [],
+        versions: [],
+        trash: { blocks: [], scenes: [] },
+        goals: { targetWords: 15000, targetPages: 60 },
+        historyDays: {},
+        createdAt: Date.now(),
+        lastEdited: Date.now()
+      };
+    }
+
+    window.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

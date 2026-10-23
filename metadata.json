@@ -1,0 +1,6 @@
+{
+  "name": "Scene Stack",
+  "description": "Mobile-first, non-destructive screenwriting studio with shot lists, story cards, character references, and industry formatting.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
