@@ -2920,6 +2920,9 @@
           <button class="icon-btn" id="btn-topbar-redo" title="Redo" style="width:38px;height:38px;">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
           </button>
+          <button class="icon-btn" id="btn-editor-settings" title="Studio Settings" style="width:38px;height:38px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          </button>
           <button class="icon-btn" id="btn-editor-menu" title="Story Menu" style="width:38px;height:38px;">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
           </button>
@@ -3024,10 +3027,16 @@
               <div style="font-size:17px;font-weight:700;color:var(--text);letter-spacing:-0.2px;">Storyboards & Visuals</div>
               <div style="font-size:12px;color:var(--text-muted);" id="images-count-badge">0 Sketches across scenario</div>
             </div>
-            <button class="btn-primary" id="btn-add-new-sketch" onclick="createNewSketchFromGallery()" style="padding:7px 14px;border-radius:var(--radius-pill);gap:6px;font-size:12px;">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              <span>+ New Sketch</span>
-            </button>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <button class="btn-secondary" id="btn-export-all-storyboard" onclick="exportAllStoryboardsComposite()" style="padding:7px 12px;border-radius:var(--radius-pill);gap:6px;font-size:12px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                <span>Export Board</span>
+              </button>
+              <button class="btn-primary" id="btn-add-new-sketch" onclick="createNewSketchFromGallery()" style="padding:7px 14px;border-radius:var(--radius-pill);gap:6px;font-size:12px;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                <span>+ New Sketch</span>
+              </button>
+            </div>
           </div>
           <div class="images-gallery-grid" id="images-gallery-grid"></div>
         </div>
@@ -3195,6 +3204,9 @@
           <div style="display:flex;align-items:center;gap:8px;">
             <button class="icon-btn" id="btn-draw-undo" onclick="undoDrawingStroke()" title="Undo stroke" style="width:34px;height:34px;">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+            </button>
+            <button class="icon-btn" id="btn-draw-redo" onclick="redoDrawingStroke()" title="Redo stroke" style="width:34px;height:34px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
             </button>
             <button class="icon-btn" id="btn-draw-clear" onclick="clearDrawingCanvas()" title="Clear canvas" style="width:34px;height:34px;">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
@@ -3454,6 +3466,11 @@
       setupScrollFabFade();
       checkFirstUseTips();
 
+      // Initialize IndexedDB and migrate from localStorage if needed
+      initStorageAndMigrate().then(() => {
+        renderHome();
+      });
+
       // Cinematic App Opening / Splash Animation dismiss transition
       setTimeout(() => {
         const splash = document.getElementById('app-splash-screen');
@@ -3469,7 +3486,11 @@
     }
 
     function saveGlobalSettings() {
-      localStorage.setItem(SETTINGS_KEY, JSON.stringify(Settings));
+      try {
+        localStorage.setItem(SETTINGS_KEY, JSON.stringify(Settings));
+      } catch (e) {
+        console.warn('Failed to save settings:', e);
+      }
       applySettingsToDom();
     }
 
@@ -3835,6 +3856,14 @@
             </div>
           </button>
 
+          <button class="menu-row" onclick="triggerImportProjectsJson()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <div>
+              <div>Import Projects (.json)</div>
+              <div style="font-size:11px;color:var(--text-muted);">Restore or import project backup</div>
+            </div>
+          </button>
+
           <button class="menu-row" onclick="window.print()">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
             <div>
@@ -3873,6 +3902,124 @@
     }
 
     // ==========================================================================
+    // PERSISTENCE & STORAGE: INDEXEDDB + LOCALSTORAGE MIGRATION + MEMORY CACHE
+    // ==========================================================================
+    const DB_NAME = 'SceneStackDB';
+    const DB_VERSION = 1;
+    let ProjectMemoryCache = {};
+    let dbInstance = null;
+
+    function openSceneStackDB() {
+      return new Promise((resolve) => {
+        if (dbInstance) return resolve(dbInstance);
+        try {
+          const req = indexedDB.open(DB_NAME, DB_VERSION);
+          req.onupgradeneeded = (e) => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains('projects')) {
+              db.createObjectStore('projects', { keyPath: 'id' });
+            }
+            if (!db.objectStoreNames.contains('metadata')) {
+              db.createObjectStore('metadata', { keyPath: 'key' });
+            }
+          };
+          req.onsuccess = (e) => {
+            dbInstance = e.target.result;
+            resolve(dbInstance);
+          };
+          req.onerror = (e) => {
+            console.warn('IndexedDB open error:', e);
+            resolve(null);
+          };
+        } catch (e) {
+          console.warn('IndexedDB unsupported or failed', e);
+          resolve(null);
+        }
+      });
+    }
+
+    async function initStorageAndMigrate() {
+      try {
+        const db = await openSceneStackDB();
+        const rawIndex = localStorage.getItem(INDEX_KEY);
+        let list = [];
+        if (rawIndex) {
+          try { list = JSON.parse(rawIndex); } catch (e) { list = []; }
+        }
+
+        const isMigrated = localStorage.getItem('scene_stack_idb_migrated');
+
+        if (db) {
+          if (!isMigrated) {
+            let migrationSuccess = true;
+            for (const item of list) {
+              const rawProj = localStorage.getItem('scene_stack_proj_' + item.id);
+              if (rawProj) {
+                try {
+                  const projData = JSON.parse(rawProj);
+                  ProjectMemoryCache[item.id] = projData;
+                  await new Promise((res) => {
+                    const tx = db.transaction('projects', 'readwrite');
+                    tx.objectStore('projects').put(projData);
+                    tx.oncomplete = () => res();
+                    tx.onerror = () => { migrationSuccess = false; res(); };
+                  });
+                } catch (e) {
+                  console.warn('Error migrating proj ' + item.id, e);
+                }
+              }
+            }
+            if (migrationSuccess) {
+              localStorage.setItem('scene_stack_idb_migrated', 'true');
+            }
+          } else {
+            await new Promise((resolve) => {
+              const tx = db.transaction('projects', 'readonly');
+              const store = tx.objectStore('projects');
+              const getAllReq = store.getAll();
+              getAllReq.onsuccess = () => {
+                const all = getAllReq.result || [];
+                all.forEach(p => {
+                  ProjectMemoryCache[p.id] = p;
+                });
+                resolve();
+              };
+              getAllReq.onerror = () => resolve();
+            });
+          }
+        }
+
+        list.forEach(m => {
+          if (!ProjectMemoryCache[m.id]) {
+            const raw = localStorage.getItem('scene_stack_proj_' + m.id);
+            if (raw) {
+              try { ProjectMemoryCache[m.id] = JSON.parse(raw); } catch (e) {}
+            }
+          }
+        });
+      } catch (err) {
+        console.error('Storage initialization error:', err);
+      }
+    }
+
+    function deleteProjectData(id) {
+      delete ProjectMemoryCache[id];
+      try {
+        localStorage.removeItem('scene_stack_proj_' + id);
+      } catch (e) {}
+      openSceneStackDB().then(db => {
+        if (db) {
+          try {
+            const tx = db.transaction('projects', 'readwrite');
+            tx.objectStore('projects').delete(id);
+          } catch (e) {
+            console.error('IDB delete error', e);
+          }
+        }
+      }).catch(e => {});
+    }
+
+    // ==========================================================================
     // LEVEL 1: HOME CONTROLLER
     // ==========================================================================
     function getProjectList() {
@@ -3880,12 +4027,26 @@
         const raw = localStorage.getItem(INDEX_KEY);
         return raw ? JSON.parse(raw) : [];
       } catch (e) {
+        console.warn('Error reading project index', e);
         return [];
       }
     }
 
     function saveProjectList(list) {
-      localStorage.setItem(INDEX_KEY, JSON.stringify(list));
+      try {
+        localStorage.setItem(INDEX_KEY, JSON.stringify(list));
+      } catch (e) {
+        console.error('Storage quota reached for project list:', e);
+        showToast('Storage quota warning: project list not cached');
+      }
+      openSceneStackDB().then(db => {
+        if (db) {
+          try {
+            const tx = db.transaction('metadata', 'readwrite');
+            tx.objectStore('metadata').put({ key: INDEX_KEY, value: list });
+          } catch (err) {}
+        }
+      }).catch(e => {});
     }
 
     function renderHome() {
@@ -4000,17 +4161,18 @@
 
       document.getElementById('m-proj-rename').onclick = () => {
         closeSheet();
-        const nt = prompt('Rename project:', projectMeta.title);
-        if (nt && nt.trim()) {
-          projectMeta.title = nt.trim();
-          updateProjectMeta(projectMeta);
-          const full = loadProjectData(projectMeta.id);
-          if (full) {
-            full.title = nt.trim();
-            saveProjectData(full);
+        showPromptSheet('Rename Story', 'Story Title', projectMeta.title, false, (nt) => {
+          if (nt && nt.trim()) {
+            projectMeta.title = nt.trim();
+            updateProjectMeta(projectMeta);
+            const full = loadProjectData(projectMeta.id);
+            if (full) {
+              full.title = nt.trim();
+              saveProjectData(full);
+            }
+            renderHome();
           }
-          renderHome();
-        }
+        });
       };
 
       document.getElementById('m-proj-duplicate').onclick = () => {
@@ -4059,66 +4221,132 @@
       };
     }
 
-    function openNewProjectSheet() {
-      const body = `
-        <div class="input-label">Project Title</div>
-        <input class="text-input" id="new-proj-title" placeholder="e.g. Neon Convergence" autofocus>
+    function openArchivedProjectsSheet() {
+      const projects = getProjectList();
+      const archived = projects.filter(p => p.archived);
 
-        <div class="input-label" style="margin-top:10px;">Format</div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;">
-          <button class="icon-btn-sm active" style="width:auto;padding:0 12px;" data-format="Feature">Feature</button>
-          <button class="icon-btn-sm" style="width:auto;padding:0 12px;" data-format="Short film">Short film</button>
-          <button class="icon-btn-sm" style="width:auto;padding:0 12px;" data-format="Series episode">Series episode</button>
-          <button class="icon-btn-sm" style="width:auto;padding:0 12px;" data-format="Blank">Blank</button>
-        </div>
+      let contentHtml = '';
+      if (archived.length === 0) {
+        contentHtml = `
+          <div style="text-align:center;padding:32px 16px;color:var(--text-muted);">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:12px;opacity:0.6;"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+            <div style="font-size:15px;font-weight:600;color:var(--text);">No Archived Stories</div>
+            <div style="font-size:12px;margin-top:4px;">Stories you archive to tidy your workspace will appear here.</div>
+          </div>
+        `;
+      } else {
+        contentHtml = archived.map(p => `
+          <div class="menu-row" style="cursor:default;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;background:var(--surface-2);border-radius:var(--radius-card);margin-bottom:8px;">
+            <div style="flex:1;overflow:hidden;">
+              <div style="font-weight:700;font-size:14px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(p.title || 'Untitled')}</div>
+              <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">${escapeHtml(p.format || 'Feature')} • ${plural(p.sceneCount || 0, 'scene')}</div>
+            </div>
+            <div style="display:flex;gap:6px;">
+              <button class="btn-secondary" style="height:32px;padding:0 10px;font-size:12px;border-radius:var(--radius-pill);" onclick="restoreArchivedProject('${p.id}')">Restore</button>
+              <button class="icon-btn-sm" style="color:var(--danger);" title="Move to Trash" onclick="trashArchivedProject('${p.id}')">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+              </button>
+            </div>
+          </div>
+        `).join('');
+      }
 
-        <div class="input-label" style="margin-top:10px;">Template</div>
-        <select class="select-input" id="new-proj-template">
-          <option value="blank">Blank Script</option>
-          <option value="3act">Three-Act Classic</option>
-          <option value="save_cat">Save the Cat (15 Beats)</option>
-          <option value="hero">Hero's Journey</option>
-          <option value="short5">Short Film (5 Beats)</option>
-        </select>
+      openSheet(`Archived Stories (${archived.length})`, contentHtml);
+    }
 
-        <button class="btn-primary" style="margin-top:16px;" id="btn-confirm-create-project">Create Project</button>
-      `;
-
-      openSheet('New Project', body);
-
-      let selectedFormat = 'Feature';
-      document.querySelectorAll('.icon-btn-sm[data-format]').forEach(btn => {
-        btn.onclick = () => {
-          document.querySelectorAll('.icon-btn-sm[data-format]').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          selectedFormat = btn.dataset.format;
-        };
-      });
-
-      document.getElementById('btn-confirm-create-project').onclick = () => {
-        const title = document.getElementById('new-proj-title').value.trim() || 'Untitled Story';
-        const template = document.getElementById('new-proj-template').value;
-        const projId = 'proj_' + Date.now();
-
-        const newProj = buildProjectWithStructure(projId, title, selectedFormat, '', template);
-        saveProjectData(newProj);
-
-        const list = getProjectList();
-        list.push({
-          id: projId,
-          title,
-          format: selectedFormat,
-          sceneCount: newProj.scenes.length,
-          charColors: newProj.characters.map(c => c.color),
-          createdAt: Date.now(),
-          lastEdited: Date.now()
-        });
+    function restoreArchivedProject(id) {
+      const list = getProjectList();
+      const m = list.find(p => p.id === id);
+      if (m) {
+        m.archived = false;
         saveProjectList(list);
-
-        closeSheet();
         renderHome();
-        openProject(projId);
-      };
+        openArchivedProjectsSheet();
+        showUndoToast(`Restored "${m.title}" to Home`);
+      }
+    }
+
+    function trashArchivedProject(id) {
+      const list = getProjectList();
+      const m = list.find(p => p.id === id);
+      if (m) {
+        m.archived = false;
+        m.inTrash = true;
+        saveProjectList(list);
+        renderHome();
+        openArchivedProjectsSheet();
+        showUndoToast(`Moved "${m.title}" to Trash`);
+      }
+    }
+
+    function openTrashedProjectsSheet() {
+      const projects = getProjectList();
+      const trashed = projects.filter(p => p.inTrash);
+
+      let headerHtml = '';
+      if (trashed.length > 0) {
+        headerHtml = `
+          <div style="display:flex;justify-content:flex-end;margin-bottom:10px;">
+            <button class="btn-secondary" style="height:30px;padding:0 10px;font-size:11px;border-radius:var(--radius-pill);color:var(--danger);" onclick="clearAllTrashPermanently()">
+              Empty All Trash
+            </button>
+          </div>
+        `;
+      }
+
+      let contentHtml = '';
+      if (trashed.length === 0) {
+        contentHtml = `
+          <div style="text-align:center;padding:32px 16px;color:var(--text-muted);">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:12px;opacity:0.6;"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            <div style="font-size:15px;font-weight:600;color:var(--text);">Trash is Empty</div>
+            <div style="font-size:12px;margin-top:4px;">Deleted stories and scenes will appear here until permanently deleted.</div>
+          </div>
+        `;
+      } else {
+        contentHtml = headerHtml + trashed.map(p => `
+          <div class="menu-row" style="cursor:default;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;background:var(--surface-2);border-radius:var(--radius-card);margin-bottom:8px;">
+            <div style="flex:1;overflow:hidden;">
+              <div style="font-weight:700;font-size:14px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(p.title || 'Untitled')}</div>
+              <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">${escapeHtml(p.format || 'Feature')} • ${plural(p.sceneCount || 0, 'scene')}</div>
+            </div>
+            <div style="display:flex;gap:6px;">
+              <button class="btn-secondary" style="height:32px;padding:0 10px;font-size:12px;border-radius:var(--radius-pill);" onclick="restoreTrashedProject('${p.id}')">Restore</button>
+              <button class="icon-btn-sm" style="color:var(--danger);" title="Delete Permanently" onclick="confirmDeleteProjectPermanently('${p.id}')">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      openSheet(`Trash (${trashed.length})`, contentHtml);
+    }
+
+    function restoreTrashedProject(id) {
+      const list = getProjectList();
+      const m = list.find(p => p.id === id);
+      if (m) {
+        m.inTrash = false;
+        saveProjectList(list);
+        renderHome();
+        openTrashedProjectsSheet();
+        showUndoToast(`Restored "${m.title}"`);
+      }
+    }
+
+    function confirmDeleteProjectPermanently(id) {
+      const list = getProjectList();
+      const m = list.find(p => p.id === id);
+      const title = m ? m.title : 'this story';
+      showConfirmSheet('Delete Story Permanently', `Are you sure you want to permanently delete "${title}"? This cannot be undone.`, 'Delete Permanently', true, () => {
+        deleteProjectData(id);
+        const updatedList = getProjectList().filter(p => p.id !== id);
+        saveProjectList(updatedList);
+        renderHome();
+        openTrashedProjectsSheet();
+        showToast('Story permanently deleted');
+      });
     }
 
     function buildProjectWithStructure(id, title, format, logline, template) {
@@ -4210,33 +4438,60 @@
     // LEVEL 2: EDITOR CONTROLLER
     // ==========================================================================
     function loadProjectData(id) {
+      if (!id) return null;
+      if (ProjectMemoryCache[id]) return ProjectMemoryCache[id];
       try {
         const raw = localStorage.getItem('scene_stack_proj_' + id);
-        return raw ? JSON.parse(raw) : null;
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          ProjectMemoryCache[id] = parsed;
+          return parsed;
+        }
       } catch (e) {
-        return null;
+        console.warn('Failed reading project ' + id, e);
       }
+      return null;
     }
 
     function saveProjectData(proj) {
-      if (!proj) return;
+      if (!proj || !proj.id) return;
       proj.lastEdited = Date.now();
 
       const todayStr = new Date().toISOString().slice(0, 10);
       if (!proj.historyDays) proj.historyDays = {};
       let totalWords = 0;
-      Object.values(proj.blocks).forEach(b => {
+      Object.values(proj.blocks || {}).forEach(b => {
         if (!b.hidden && b.content) totalWords += b.content.trim().split(/\s+/).filter(Boolean).length;
       });
       proj.historyDays[todayStr] = (proj.historyDays[todayStr] || 0) + 1;
 
-      localStorage.setItem('scene_stack_proj_' + proj.id, JSON.stringify(proj));
+      // Keep synchronous in-memory cache updated
+      ProjectMemoryCache[proj.id] = proj;
+
+      // Asynchronously persist to IndexedDB
+      openSceneStackDB().then(db => {
+        if (db) {
+          try {
+            const tx = db.transaction('projects', 'readwrite');
+            tx.objectStore('projects').put(proj);
+          } catch (e) {
+            console.error('IDB put error', e);
+          }
+        }
+      }).catch(e => console.warn('IDB write failed', e));
+
+      // Attempt localStorage write with try/catch to maintain fallback
+      try {
+        localStorage.setItem('scene_stack_proj_' + proj.id, JSON.stringify(proj));
+      } catch (e) {
+        console.warn('localStorage quota reached; preserved safely in IndexedDB', e);
+      }
 
       const list = getProjectList();
       const m = list.find(p => p.id === proj.id);
       if (m) {
         m.title = proj.title;
-        m.sceneCount = proj.scenes.length;
+        m.sceneCount = (proj.scenes || []).length;
         m.charColors = (proj.characters || []).map(c => c.color);
         m.currentWords = totalWords;
         m.targetWords = proj.goals?.targetWords;
@@ -4339,9 +4594,22 @@
               const idx = sc.blockIds.indexOf(op.blockId);
               if (idx > -1) sc.blockIds.splice(idx, 1);
             }
+            if (!CurrentProject.trash) CurrentProject.trash = { blocks: [], scenes: [] };
             if (!CurrentProject.trash.blocks) CurrentProject.trash.blocks = [];
             CurrentProject.trash.blocks.push({ block: b, sceneId: b.sceneId, deletedAt: Date.now() });
             delete CurrentProject.blocks[op.blockId];
+          }
+          break;
+        }
+
+        case 'DELETE_SCENE': {
+          const scIdx = CurrentProject.scenes.findIndex(s => s.id === op.sceneId);
+          if (scIdx > -1) {
+            const sc = CurrentProject.scenes.splice(scIdx, 1)[0];
+            CurrentProject.scenes.forEach((s, i) => s.number = i + 1);
+            if (!CurrentProject.trash) CurrentProject.trash = { blocks: [], scenes: [] };
+            if (!CurrentProject.trash.scenes) CurrentProject.trash.scenes = [];
+            CurrentProject.trash.scenes.push({ scene: sc, index: scIdx, deletedAt: Date.now() });
           }
           break;
         }
@@ -4468,15 +4736,41 @@
         btn.classList.toggle('active', btn.dataset.tab === ActiveTab);
       });
 
-      // Always reset scroll to the very top so shots, scenes, characters, and locations lists start at the top
-      const ws = document.getElementById('editor-workspace');
-      if (ws) ws.scrollTop = 0;
-
       if (ActiveTab === 'write') renderWriteView();
       else if (ActiveTab === 'board') renderBoardView();
       else if (ActiveTab === 'shots') renderShotsView();
       else if (ActiveTab === 'cast') renderCastView();
       else if (ActiveTab === 'images') renderImagesView();
+
+      const ws = document.getElementById('editor-workspace');
+      if (ws) {
+        const scrollKey = CurrentProject.id + '_' + ActiveTab;
+        const targetScroll = ProjectScrollPositions[scrollKey] || 0;
+        requestAnimationFrame(() => {
+          ws.scrollTop = targetScroll;
+        });
+      }
+    }
+
+    let ProjectScrollPositions = {};
+    try {
+      const rawSp = localStorage.getItem('scene_stack_scroll_positions');
+      if (rawSp) ProjectScrollPositions = JSON.parse(rawSp);
+    } catch (e) {}
+
+    let scrollSaveTimeout = null;
+    function handleWorkspaceScroll() {
+      if (!CurrentProject) return;
+      const ws = document.getElementById('editor-workspace');
+      if (!ws) return;
+      if (scrollSaveTimeout) clearTimeout(scrollSaveTimeout);
+      scrollSaveTimeout = setTimeout(() => {
+        const key = CurrentProject.id + '_' + ActiveTab;
+        ProjectScrollPositions[key] = ws.scrollTop;
+        try {
+          localStorage.setItem('scene_stack_scroll_positions', JSON.stringify(ProjectScrollPositions));
+        } catch (e) {}
+      }, 300);
     }
 
     // ==========================================================================
@@ -4755,6 +5049,7 @@
     // ==========================================================================
     // TACTILE LONG-PRESS RECOGNIZER & ACTION ENGINE
     // ==========================================================================
+    let lastGlobalTouchEndTime = 0;
     function addLongPressListener(el, onLongPress, onClick) {
       let timer = null;
       let startX = 0, startY = 0;
@@ -4762,6 +5057,9 @@
       let hasMoved = false;
 
       const handleStart = (e) => {
+        if (e.type === 'mousedown' && Date.now() - lastGlobalTouchEndTime < 700) {
+          return;
+        }
         triggered = false;
         hasMoved = false;
         const touch = e.touches ? e.touches[0] : e;
@@ -4787,14 +5085,20 @@
       };
 
       const handleMove = (e) => {
+        if (e.type === 'mousemove' && Date.now() - lastGlobalTouchEndTime < 700) return;
         const touch = e.touches ? e.touches[0] : e;
-        if (Math.hypot(touch.clientX - startX, touch.clientY - startY) > 8) {
+        if (Math.hypot(touch.clientX - startX, touch.clientY - startY) > 10) {
           hasMoved = true;
           handleCancel();
         }
       };
 
       const handleEnd = (e) => {
+        if (e.type === 'touchend') {
+          lastGlobalTouchEndTime = Date.now();
+        } else if (e.type === 'mouseup' && Date.now() - lastGlobalTouchEndTime < 700) {
+          return;
+        }
         handleCancel();
         if (!triggered && !hasMoved && onClick) {
           if (Settings.asmrSound !== false) playAsmrCardTap();
@@ -4804,8 +5108,8 @@
 
       el.addEventListener('touchstart', handleStart, { passive: true });
       el.addEventListener('touchmove', handleMove, { passive: true });
-      el.addEventListener('touchend', handleEnd);
-      el.addEventListener('touchcancel', handleCancel);
+      el.addEventListener('touchend', handleEnd, { passive: true });
+      el.addEventListener('touchcancel', handleCancel, { passive: true });
 
       el.addEventListener('mousedown', handleStart);
       el.addEventListener('mousemove', handleMove);
@@ -5257,12 +5561,12 @@
     function addBlockComment(blockId) {
       const b = CurrentProject.blocks[blockId];
       if (!b) return;
-      const comm = prompt('Add private comment on block:', b.comment || '');
-      if (comm !== null) {
-        b.comment = comm.trim();
+      showPromptSheet('Block Comment', 'Private Note / Production Comment', b.comment || '', true, (comm) => {
+        b.comment = (comm || '').trim();
         saveProjectData(CurrentProject);
         renderWriteView();
-      }
+        showUndoToast('Comment saved');
+      });
     }
 
     function openBlockTypePicker(blockId) {
@@ -5387,14 +5691,36 @@
     }
 
     function createResearchNote() {
-      const title = prompt('Research note title:');
-      if (title && title.trim()) {
-        const text = prompt('Note body or reference link:');
+      openNewResearchNoteSheet();
+    }
+
+    function openNewResearchNoteSheet() {
+      const body = `
+        <div class="input-label">Note Title</div>
+        <input class="text-input" id="rn-new-title" placeholder="e.g. Cybernetics Lore, Weapon Specs" autofocus>
+        <div class="input-label" style="margin-top:12px;">Notes / Reference URL / Excerpt</div>
+        <textarea class="textarea-input" id="rn-new-body" rows="4" placeholder="Enter notes or paste links here..."></textarea>
+        <div style="display:flex;gap:10px;margin-top:16px;">
+          <button class="btn-secondary" style="flex:1;" onclick="closeSheet()">Cancel</button>
+          <button class="btn-primary" id="btn-save-research-note" style="flex:1;">Save to Binder</button>
+        </div>
+      `;
+      openSheet('New Research Note', body);
+
+      document.getElementById('btn-save-research-note').onclick = () => {
+        const title = document.getElementById('rn-new-title').value.trim();
+        const text = document.getElementById('rn-new-body').value.trim();
+        if (!title) {
+          showToast('Please enter a note title');
+          return;
+        }
         if (!CurrentProject.researchNotes) CurrentProject.researchNotes = [];
-        CurrentProject.researchNotes.push({ id: 'rn_' + Date.now(), title: title.trim(), text: text || '' });
+        CurrentProject.researchNotes.push({ id: 'rn_' + Date.now(), title, text });
         saveProjectData(CurrentProject);
+        closeSheet();
         openBinderDrawer();
-      }
+        showToast('Research note added');
+      };
     }
 
     function openReferenceSplitView(note) {
@@ -5405,13 +5731,14 @@
     }
 
     function quickCaptureIdea() {
-      const idea = prompt('Quick Capture Idea (saved to Binder):');
-      if (idea && idea.trim()) {
-        if (!CurrentProject.ideasInbox) CurrentProject.ideasInbox = [];
-        CurrentProject.ideasInbox.unshift({ id: 'id_' + Date.now(), text: idea.trim(), date: Date.now() });
-        saveProjectData(CurrentProject);
-        showUndoToast('Idea captured in Binder');
-      }
+      showPromptSheet('Quick Capture Idea', 'Idea / Scene Beat (Saved to Binder)', '', true, (idea) => {
+        if (idea && idea.trim()) {
+          if (!CurrentProject.ideasInbox) CurrentProject.ideasInbox = [];
+          CurrentProject.ideasInbox.unshift({ id: 'id_' + Date.now(), text: idea.trim(), date: Date.now() });
+          saveProjectData(CurrentProject);
+          showUndoToast('Idea captured in Binder');
+        }
+      });
     }
 
     // ==========================================================================
@@ -5942,26 +6269,36 @@
         reader.onload = (evt) => {
           const img = new Image();
           img.onload = () => {
-            const maxDim = 256;
-            let w = img.width, h = img.height;
-            if (w > maxDim || h > maxDim) {
-              if (w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
-              else { w = Math.round((w * maxDim) / h); h = maxDim; }
-            }
-            const canvas = document.createElement('canvas');
-            canvas.width = w;
-            canvas.height = h;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, w, h);
-            const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+            try {
+              const maxDim = 256;
+              let w = img.width, h = img.height;
+              if (w > maxDim || h > maxDim) {
+                if (w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
+                else { w = Math.round((w * maxDim) / h); h = maxDim; }
+              }
+              const canvas = document.createElement('canvas');
+              canvas.width = w;
+              canvas.height = h;
+              const ctx = canvas.getContext('2d');
+              ctx.drawImage(img, 0, 0, w, h);
+              const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
 
-            char.avatar = dataUrl;
-            saveProjectData(CurrentProject);
-            renderCastView();
-            if (ActiveTab === 'write') renderWriteView();
-            showUndoToast(`✓ Updated portrait for ${char.name}`);
+              char.avatar = dataUrl;
+              saveProjectData(CurrentProject);
+              renderCastView();
+              if (ActiveTab === 'write') renderWriteView();
+              showUndoToast(`✓ Updated portrait for ${char.name}`);
+            } catch (err) {
+              showToast('Error processing character image: ' + err.message);
+            }
+          };
+          img.onerror = () => {
+            showToast('Failed to load character image');
           };
           img.src = evt.target.result;
+        };
+        reader.onerror = () => {
+          showToast('Failed to read image file');
         };
         reader.readAsDataURL(file);
       };
@@ -6100,26 +6437,36 @@
         reader.onload = (evt) => {
           const img = new Image();
           img.onload = () => {
-            const maxDim = 256;
-            let w = img.width, h = img.height;
-            if (w > maxDim || h > maxDim) {
-              if (w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
-              else { w = Math.round((w * maxDim) / h); h = maxDim; }
-            }
-            const canvas = document.createElement('canvas');
-            canvas.width = w;
-            canvas.height = h;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, w, h);
-            const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+            try {
+              const maxDim = 256;
+              let w = img.width, h = img.height;
+              if (w > maxDim || h > maxDim) {
+                if (w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
+                else { w = Math.round((w * maxDim) / h); h = maxDim; }
+              }
+              const canvas = document.createElement('canvas');
+              canvas.width = w;
+              canvas.height = h;
+              const ctx = canvas.getContext('2d');
+              ctx.drawImage(img, 0, 0, w, h);
+              const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
 
-            currentEditingCharAvatar = dataUrl;
-            const prevEl = document.getElementById('char-avatar-preview');
-            if (prevEl) prevEl.innerHTML = `<img src="${dataUrl}" style="width:100%;height:100%;object-fit:cover;">`;
-            const btnRem = document.getElementById('btn-remove-char-avatar');
-            if (btnRem) btnRem.style.display = 'inline-flex';
+              currentEditingCharAvatar = dataUrl;
+              const prevEl = document.getElementById('char-avatar-preview');
+              if (prevEl) prevEl.innerHTML = `<img src="${dataUrl}" style="width:100%;height:100%;object-fit:cover;">`;
+              const btnRem = document.getElementById('btn-remove-char-avatar');
+              if (btnRem) btnRem.style.display = 'inline-flex';
+            } catch (err) {
+              showToast('Error processing character image: ' + err.message);
+            }
+          };
+          img.onerror = () => {
+            showToast('Failed to load character image');
           };
           img.src = evt.target.result;
+        };
+        reader.onerror = () => {
+          showToast('Failed to read image file');
         };
         reader.readAsDataURL(file);
       };
@@ -6306,6 +6653,10 @@
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
           <span>Quick Capture Idea</span>
         </button>
+        <button class="menu-row" id="m-trash-bin">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          <span>Script Trash & Deleted Items</span>
+        </button>
         <button class="menu-row" id="m-table-read">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
           <span>Table Read (Voice Aloud)</span>
@@ -6323,6 +6674,10 @@
         <button class="menu-row" id="m-export-fountain">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/></svg>
           <span>Fountain Script (.fountain)</span>
+        </button>
+        <button class="menu-row" id="m-export-storyboard">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <span>Export Storyboard Canvas (.png)</span>
         </button>
         <button class="menu-row" id="m-export-json">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -6349,10 +6704,12 @@
       document.getElementById('m-toggle-focus').onclick = () => { closeSheet(); enterFocusMode(); };
       document.getElementById('m-open-binder').onclick = () => { closeSheet(); openBinderDrawer(); };
       document.getElementById('m-quick-capture').onclick = () => { closeSheet(); quickCaptureIdea(); };
+      document.getElementById('m-trash-bin').onclick = () => { closeSheet(); openProjectTrashSheet(); };
       document.getElementById('m-table-read').onclick = () => { closeSheet(); startTableRead(); };
       document.getElementById('m-check-consistency').onclick = () => { closeSheet(); runConsistencyChecker(); };
       document.getElementById('m-export-print').onclick = () => { closeSheet(); exportPrint(); };
       document.getElementById('m-export-fountain').onclick = () => { closeSheet(); exportFountain(); };
+      document.getElementById('m-export-storyboard').onclick = () => { closeSheet(); exportAllStoryboardsComposite(); };
       document.getElementById('m-export-json').onclick = () => { closeSheet(); exportJsonBackup(); };
       document.getElementById('m-settings').onclick = () => { closeSheet(); openFullSettingsSheet(); };
       document.getElementById('m-close').onclick = () => { closeSheet(); closeEditorToHome(); };
@@ -6555,28 +6912,138 @@
     }
 
     function exportAllProjectsJson() {
-      const list = getProjectList();
-      const all = {};
-      list.forEach(m => {
-        const p = loadProjectData(m.id);
-        if (p) all[m.id] = p;
-      });
-      triggerDownload(JSON.stringify(all, null, 2), 'scenestack_all_projects_backup.json', 'application/json');
+      try {
+        const list = getProjectList();
+        const all = {};
+        list.forEach(m => {
+          const p = loadProjectData(m.id);
+          if (p) all[m.id] = p;
+        });
+        const jsonStr = JSON.stringify(all, null, 2);
+        triggerDownload(jsonStr, 'scenestack_all_projects_backup.json', 'application/json');
+        showToast('Exported backup of all stories');
+      } catch (e) {
+        showToast('Export failed: ' + e.message);
+      }
+    }
+
+    function triggerImportProjectsJson() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'application/json,.json';
+      input.onchange = (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          try {
+            const data = JSON.parse(evt.target.result);
+            let importedCount = 0;
+            const currentList = getProjectList();
+
+            const processProject = (proj) => {
+              if (!proj || typeof proj !== 'object' || !proj.title) return false;
+              const newId = 'proj_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+              const cloned = JSON.parse(JSON.stringify(proj));
+              cloned.id = newId;
+
+              const titleExists = currentList.some(item => item.title === cloned.title);
+              if (titleExists) {
+                cloned.title = cloned.title + ' (Imported)';
+              }
+
+              if (!cloned.scenes) cloned.scenes = [];
+              if (!cloned.blocks) cloned.blocks = {};
+              if (!cloned.characters) cloned.characters = [];
+              if (!cloned.locations) cloned.locations = [];
+              if (!cloned.trash) cloned.trash = { blocks: [], scenes: [] };
+
+              saveProjectData(cloned);
+
+              currentList.push({
+                id: newId,
+                title: cloned.title,
+                format: cloned.format || 'Feature',
+                logline: cloned.logline || '',
+                sceneCount: cloned.scenes.length,
+                charColors: (cloned.characters || []).map(c => c.color),
+                createdAt: cloned.createdAt || Date.now(),
+                lastEdited: Date.now()
+              });
+              importedCount++;
+              return true;
+            };
+
+            if (Array.isArray(data)) {
+              data.forEach(p => processProject(p));
+            } else if (data.scenes && data.blocks) {
+              processProject(data);
+            } else if (typeof data === 'object') {
+              Object.values(data).forEach(p => processProject(p));
+            }
+
+            if (importedCount > 0) {
+              saveProjectList(currentList);
+              renderHome();
+              closeSheet();
+              showToast(`Imported ${plural(importedCount, 'project')}`);
+            } else {
+              showToast('No valid project found in JSON');
+            }
+          } catch (err) {
+            console.error('Import error', err);
+            showToast('Invalid JSON file format: ' + err.message);
+          }
+        };
+        reader.onerror = () => {
+          showToast('Failed to read file');
+        };
+        reader.readAsText(file);
+      };
+      input.click();
     }
 
     function triggerDownload(content, filename, mime) {
-      if (window.AndroidBridge && window.AndroidBridge.shareText && mime.startsWith('text/')) {
-        window.AndroidBridge.shareText(filename, content);
+      try {
+        const base64Str = btoa(unescape(encodeURIComponent(content)));
+        if (window.AndroidBridge && typeof window.AndroidBridge.saveFile === 'function') {
+          window.AndroidBridge.saveFile(filename, mime, base64Str);
+          return;
+        }
+      } catch (e) {
+        console.warn('Bridge saveFile error:', e);
       }
-      const blob = new Blob([content], { type: mime });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      try {
+        const blob = new Blob([content], { type: mime });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } catch (e) {
+        showToast('Download error: ' + e.message);
+      }
+    }
+
+    function saveBase64File(filename, mime, base64Data) {
+      if (window.AndroidBridge && typeof window.AndroidBridge.saveFile === 'function') {
+        const raw = base64Data.includes(',') ? base64Data.split(',')[1] : base64Data;
+        window.AndroidBridge.saveFile(filename, mime, raw);
+        return;
+      }
+      try {
+        const a = document.createElement('a');
+        a.href = base64Data;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      } catch (e) {
+        console.error('Download fallback error:', e);
+      }
     }
 
     function showUndoToast(msg, onUndo) {
@@ -6673,6 +7140,221 @@
 
     function showToast(msg) {
       showUndoToast(msg, null);
+      if (window.AndroidBridge && typeof window.AndroidBridge.showToast === 'function') {
+        try { window.AndroidBridge.showToast(msg); } catch (e) {}
+      }
+    }
+
+    function showPromptSheet(title, label, defaultValue, isMultiline, onSave) {
+      const defVal = defaultValue || '';
+      const inputHtml = isMultiline
+        ? `<textarea id="prompt-sheet-input" class="search-input" style="width:100%;height:110px;resize:none;padding:12px;border-radius:var(--radius-md);background:var(--bg-card);border:1px solid var(--border-color);color:var(--text-primary);font-family:inherit;font-size:14px;box-sizing:border-box;">${escapeHtml(defVal)}</textarea>`
+        : `<input id="prompt-sheet-input" type="text" class="search-input" value="${escapeHtml(defVal)}" style="width:100%;padding:12px;border-radius:var(--radius-md);background:var(--bg-card);border:1px solid var(--border-color);color:var(--text-primary);font-family:inherit;font-size:14px;box-sizing:border-box;" />`;
+
+      const bodyHtml = `
+        <div style="display:flex;flex-direction:column;gap:14px;padding:4px 0 16px;">
+          <label style="font-size:12px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px;">${escapeHtml(label || '')}</label>
+          ${inputHtml}
+          <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:12px;">
+            <button class="btn-secondary" id="btn-prompt-cancel" style="padding:10px 18px;border-radius:var(--radius-pill);">Cancel</button>
+            <button class="btn-primary" id="btn-prompt-save" style="padding:10px 22px;border-radius:var(--radius-pill);">Done</button>
+          </div>
+        </div>
+      `;
+
+      openSheet(title, bodyHtml, {
+        text: 'Done',
+        callback: () => {
+          const val = document.getElementById('prompt-sheet-input')?.value || '';
+          closeSheet();
+          if (onSave) onSave(val);
+        }
+      });
+
+      const inp = document.getElementById('prompt-sheet-input');
+      if (inp) {
+        inp.focus();
+        if (!isMultiline) {
+          inp.select();
+          inp.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              document.getElementById('btn-prompt-save')?.click();
+            }
+          });
+        }
+      }
+
+      const cBtn = document.getElementById('btn-prompt-cancel');
+      if (cBtn) cBtn.onclick = closeSheet;
+      const sBtn = document.getElementById('btn-prompt-save');
+      if (sBtn) {
+        sBtn.onclick = () => {
+          const val = document.getElementById('prompt-sheet-input')?.value || '';
+          closeSheet();
+          if (onSave) onSave(val);
+        };
+      }
+    }
+
+    function showConfirmSheet(title, message, confirmBtnText, isDanger, onConfirm) {
+      const btnClass = isDanger ? 'btn-danger' : 'btn-primary';
+      const dangerStyle = isDanger ? 'background:var(--color-danger, #E53935);color:#fff;border:none;' : '';
+      const bodyHtml = `
+        <div style="display:flex;flex-direction:column;gap:16px;padding:8px 0 16px;">
+          <p style="font-size:14px;line-height:1.5;color:var(--text-secondary);margin:0;">${escapeHtml(message)}</p>
+          <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:16px;">
+            <button class="btn-secondary" id="btn-confirm-cancel" style="padding:10px 18px;border-radius:var(--radius-pill);">Cancel</button>
+            <button class="${btnClass}" id="btn-confirm-ok" style="padding:10px 22px;border-radius:var(--radius-pill);${dangerStyle}">${escapeHtml(confirmBtnText || 'Confirm')}</button>
+          </div>
+        </div>
+      `;
+
+      openSheet(title, bodyHtml);
+
+      const cBtn = document.getElementById('btn-confirm-cancel');
+      if (cBtn) cBtn.onclick = closeSheet;
+      const okBtn = document.getElementById('btn-confirm-ok');
+      if (okBtn) {
+        okBtn.onclick = () => {
+          closeSheet();
+          if (onConfirm) onConfirm();
+        };
+      }
+    }
+
+    function openProjectTrashSheet() {
+      if (!CurrentProject) return;
+      if (!CurrentProject.trash) CurrentProject.trash = { blocks: [], scenes: [] };
+      const trashScenes = CurrentProject.trash.scenes || [];
+      const trashBlocks = CurrentProject.trash.blocks || [];
+
+      if (trashScenes.length === 0 && trashBlocks.length === 0) {
+        const emptyHtml = `
+          <div style="text-align:center;padding:40px 16px;color:var(--text-tertiary);">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:12px;opacity:0.6;"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6"/></svg>
+            <div style="font-size:15px;font-weight:600;color:var(--text-primary);margin-bottom:6px;">Project Trash is Empty</div>
+            <div style="font-size:13px;">Deleted scenes and script blocks from this project will appear here.</div>
+          </div>
+        `;
+        openSheet('Project Trash', emptyHtml);
+        return;
+      }
+
+      let html = `
+        <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:12px;margin-bottom:12px;border-bottom:1px solid var(--border-color);">
+          <span style="font-size:12px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;">${trashScenes.length} Scene(s), ${trashBlocks.length} Block(s)</span>
+          <button class="btn-danger" id="btn-empty-project-trash-action" style="padding:6px 12px;font-size:11px;border-radius:var(--radius-pill);background:rgba(229,57,53,0.12);color:var(--color-danger,#E53935);border:none;">Empty Trash</button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+      `;
+
+      if (trashScenes.length > 0) {
+        html += `<div style="font-size:11px;font-weight:700;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:0.5px;margin-top:6px;">Deleted Scenes</div>`;
+        trashScenes.forEach((item, idx) => {
+          const sc = item.scene || item;
+          const title = sc.title || `Scene ${sc.number || (idx + 1)}`;
+          html += `
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md);">
+              <div style="flex:1;min-width:0;margin-right:10px;">
+                <div style="font-size:13px;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Scene ${sc.number || ''}: ${escapeHtml(title)}</div>
+                <div style="font-size:11px;color:var(--text-tertiary);margin-top:2px;">${(sc.blockIds || []).length} blocks</div>
+              </div>
+              <div style="display:flex;gap:6px;">
+                <button class="btn-secondary" onclick="restoreTrashedScene(${idx})" style="padding:6px 12px;font-size:12px;border-radius:var(--radius-pill);">Restore</button>
+                <button class="icon-btn" onclick="deleteTrashedScenePermanently(${idx})" style="width:32px;height:32px;color:var(--color-danger,#E53935);" title="Delete Permanently">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+              </div>
+            </div>
+          `;
+        });
+      }
+
+      if (trashBlocks.length > 0) {
+        html += `<div style="font-size:11px;font-weight:700;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:0.5px;margin-top:12px;">Deleted Blocks</div>`;
+        trashBlocks.forEach((item, idx) => {
+          const b = item.block || item;
+          const snippet = b.content ? b.content.slice(0, 60) : (b.type === 'image' ? '[Drawing Sketch]' : `[${b.type || 'block'}]`);
+          html += `
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius-md);">
+              <div style="flex:1;min-width:0;margin-right:10px;">
+                <div style="font-size:11px;font-weight:700;color:var(--accent-color);text-transform:uppercase;">${b.type || 'block'}</div>
+                <div style="font-size:12px;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;">${escapeHtml(snippet)}</div>
+              </div>
+              <div style="display:flex;gap:6px;">
+                <button class="btn-secondary" onclick="restoreTrashedBlock(${idx})" style="padding:6px 12px;font-size:12px;border-radius:var(--radius-pill);">Restore</button>
+                <button class="icon-btn" onclick="deleteTrashedBlockPermanently(${idx})" style="width:32px;height:32px;color:var(--color-danger,#E53935);" title="Delete Permanently">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+              </div>
+            </div>
+          `;
+        });
+      }
+
+      html += `</div>`;
+      openSheet('Project Trash', html);
+
+      const emptyBtn = document.getElementById('btn-empty-project-trash-action');
+      if (emptyBtn) {
+        emptyBtn.onclick = () => {
+          showConfirmSheet('Empty Project Trash', 'Permanently delete all trashed items in this project? This cannot be undone.', 'Empty All', true, () => {
+            CurrentProject.trash = { blocks: [], scenes: [] };
+            saveProjectData(CurrentProject);
+            openProjectTrashSheet();
+            showUndoToast('Project trash emptied');
+          });
+        };
+      }
+    }
+
+    function restoreTrashedScene(idx) {
+      if (!CurrentProject || !CurrentProject.trash || !CurrentProject.trash.scenes) return;
+      const item = CurrentProject.trash.scenes[idx];
+      if (!item) return;
+      const sc = item.scene || item;
+      CurrentProject.scenes.push(sc);
+      CurrentProject.trash.scenes.splice(idx, 1);
+      saveProjectData(CurrentProject);
+      renderEditor();
+      openProjectTrashSheet();
+      showUndoToast(`✓ Restored Scene ${sc.number || ''}`);
+    }
+
+    function deleteTrashedScenePermanently(idx) {
+      if (!CurrentProject || !CurrentProject.trash || !CurrentProject.trash.scenes) return;
+      CurrentProject.trash.scenes.splice(idx, 1);
+      saveProjectData(CurrentProject);
+      openProjectTrashSheet();
+      showToast('Scene deleted permanently');
+    }
+
+    function restoreTrashedBlock(idx) {
+      if (!CurrentProject || !CurrentProject.trash || !CurrentProject.trash.blocks) return;
+      const item = CurrentProject.trash.blocks[idx];
+      if (!item) return;
+      const b = item.block || item;
+      const targetSceneId = item.sceneId || (CurrentProject.scenes[0] ? CurrentProject.scenes[0].id : null);
+      const targetScene = CurrentProject.scenes.find(s => s.id === targetSceneId) || CurrentProject.scenes[0];
+      if (targetScene) {
+        b.sceneId = targetScene.id;
+        CurrentProject.blocks[b.id] = b;
+        targetScene.blockIds.push(b.id);
+      }
+      CurrentProject.trash.blocks.splice(idx, 1);
+      saveProjectData(CurrentProject);
+      renderEditor();
+      openProjectTrashSheet();
+      showUndoToast('✓ Restored script block');
+    }
+
+    function deleteTrashedBlockPermanently(idx) {
+      if (!CurrentProject || !CurrentProject.trash || !CurrentProject.trash.blocks) return;
+      CurrentProject.trash.blocks.splice(idx, 1);
+      saveProjectData(CurrentProject);
+      openProjectTrashSheet();
+      showToast('Block deleted permanently');
     }
 
     function setupKeyboardViewport() {
@@ -6882,6 +7564,7 @@
     let CurrentDrawingBlockId = null;
     let CurrentDrawingSceneId = null;
     let DrawingUndoStack = [];
+    let DrawingRedoStack = [];
     let CurrentDrawColor = '#1A1A1A';
     let CurrentDrawSize = 7;
     let CurrentDrawOpacity = 1.0;
@@ -6895,6 +7578,8 @@
       CurrentDrawingBlockId = blockId;
       CurrentDrawingSceneId = sceneId;
       DrawingUndoStack = [];
+      DrawingRedoStack = [];
+      updateDrawingUndoRedoButtons();
 
       const block = CurrentProject.blocks[blockId];
       if (!block) return;
@@ -6994,17 +7679,50 @@
       const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
       DrawingUndoStack.push(imgData);
       if (DrawingUndoStack.length > 25) DrawingUndoStack.shift();
+      DrawingRedoStack = [];
+      updateDrawingUndoRedoButtons();
     }
 
     function undoDrawingStroke() {
       if (DrawingUndoStack.length <= 1) return;
-      DrawingUndoStack.pop(); // remove current state
+      const currentState = DrawingUndoStack.pop();
+      DrawingRedoStack.push(currentState);
       const prevState = DrawingUndoStack[DrawingUndoStack.length - 1];
       const canvas = document.getElementById('sketch-canvas');
       if (!canvas || !prevState) return;
       const ctx = canvas.getContext('2d');
       ctx.putImageData(prevState, 0, 0);
+      updateDrawingUndoRedoButtons();
       playUiSound('tap');
+    }
+
+    function redoDrawingStroke() {
+      if (DrawingRedoStack.length === 0) return;
+      const nextState = DrawingRedoStack.pop();
+      DrawingUndoStack.push(nextState);
+      const canvas = document.getElementById('sketch-canvas');
+      if (!canvas || !nextState) return;
+      const ctx = canvas.getContext('2d');
+      ctx.putImageData(nextState, 0, 0);
+      updateDrawingUndoRedoButtons();
+      playUiSound('tap');
+    }
+
+    function updateDrawingUndoRedoButtons() {
+      const undoBtn = document.getElementById('btn-draw-undo');
+      const redoBtn = document.getElementById('btn-draw-redo');
+      if (undoBtn) {
+        const canUndo = DrawingUndoStack.length > 1;
+        undoBtn.disabled = !canUndo;
+        undoBtn.style.opacity = canUndo ? '1' : '0.35';
+        undoBtn.style.pointerEvents = canUndo ? 'auto' : 'none';
+      }
+      if (redoBtn) {
+        const canRedo = DrawingRedoStack.length > 0;
+        redoBtn.disabled = !canRedo;
+        redoBtn.style.opacity = canRedo ? '1' : '0.35';
+        redoBtn.style.pointerEvents = canRedo ? 'auto' : 'none';
+      }
     }
 
     function clearDrawingCanvas() {
@@ -7326,16 +8044,190 @@
     }
 
     function exportSketchPng(blockId) {
+      if (!CurrentProject) return;
       const block = CurrentProject.blocks[blockId];
       if (!block || !block.imageData) {
         showToast('No drawing to export');
         return;
       }
-      const a = document.createElement('a');
-      a.href = block.imageData;
-      a.download = `storyboard_${block.id}.png`;
-      a.click();
-      showToast('Exported storyboard image');
+      try {
+        const titleSlug = (CurrentProject.title || 'storyboard').toLowerCase().replace(/[^a-z0-9]/g, '_');
+        const filename = `${titleSlug}_sketch_${block.id}.png`;
+        saveBase64File(filename, 'image/png', block.imageData);
+        showUndoToast('✓ Exported storyboard sketch');
+      } catch (err) {
+        showToast('Export failed: ' + err.message);
+      }
+    }
+
+    function exportAllStoryboardsComposite() {
+      if (!CurrentProject) return;
+      const sketchBlocks = [];
+      CurrentProject.scenes.forEach(scene => {
+        const loc = CurrentProject.locations.find(l => l.id === scene.locationId);
+        const locName = loc ? `${loc.type} ${loc.name}` : (scene.title || 'SCENE');
+        scene.blockIds.forEach((bId, bIdx) => {
+          const b = CurrentProject.blocks[bId];
+          if (b && b.type === 'image' && b.imageData) {
+            sketchBlocks.push({
+              block: b,
+              sceneNumber: scene.number,
+              sceneTitle: locName,
+              shotNumber: bIdx + 1,
+              caption: b.caption || b.content || ''
+            });
+          }
+        });
+      });
+
+      if (sketchBlocks.length === 0) {
+        showToast('No storyboard sketches found to export');
+        return;
+      }
+
+      const safeTitle = (CurrentProject.title || 'storyboard').toLowerCase().replace(/[^a-z0-9]/g, '_');
+      renderCompositeStoryboard(sketchBlocks, `${CurrentProject.title || 'Storyboard'} - Storyboard`, `${safeTitle}_storyboard.png`);
+    }
+
+    function exportSceneStoryboard(sceneId) {
+      if (!CurrentProject) return;
+      const scene = CurrentProject.scenes.find(s => s.id === sceneId);
+      if (!scene) return;
+      const loc = CurrentProject.locations.find(l => l.id === scene.locationId);
+      const locName = loc ? `${loc.type} ${loc.name}` : (scene.title || 'SCENE');
+
+      const sketchBlocks = [];
+      scene.blockIds.forEach((bId, bIdx) => {
+        const b = CurrentProject.blocks[bId];
+        if (b && b.type === 'image' && b.imageData) {
+          sketchBlocks.push({
+            block: b,
+            sceneNumber: scene.number,
+            sceneTitle: locName,
+            shotNumber: bIdx + 1,
+            caption: b.caption || b.content || ''
+          });
+        }
+      });
+
+      if (sketchBlocks.length === 0) {
+        showToast(`Scene ${scene.number} has no drawings`);
+        return;
+      }
+
+      const safeTitle = (CurrentProject.title || 'storyboard').toLowerCase().replace(/[^a-z0-9]/g, '_');
+      renderCompositeStoryboard(sketchBlocks, `${CurrentProject.title || 'Story'} - Scene ${scene.number}`, `${safeTitle}_scene_${scene.number}_storyboard.png`);
+    }
+
+    function renderCompositeStoryboard(shots, title, filename) {
+      showToast('Rendering storyboard PNG...');
+
+      const cols = shots.length === 1 ? 1 : 2;
+      const rows = Math.ceil(shots.length / cols);
+
+      const shotW = 600;
+      const shotH = 338;
+      const captionH = 48;
+      const cellW = shotW;
+      const cellH = shotH + captionH;
+      const pad = 28;
+      const headerH = 80;
+
+      const totalW = pad * 2 + cols * cellW + (cols - 1) * pad;
+      const totalH = pad + headerH + rows * cellH + (rows - 1) * pad + pad;
+
+      const canvas = document.createElement('canvas');
+      canvas.width = totalW;
+      canvas.height = totalH;
+      const ctx = canvas.getContext('2d');
+
+      ctx.fillStyle = '#141416';
+      ctx.fillRect(0, 0, totalW, totalH);
+
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = 'bold 24px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.fillText(title, pad, pad + 32);
+
+      ctx.fillStyle = '#8E8E93';
+      ctx.font = '13px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      const dateStr = new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+      ctx.fillText(`${shots.length} Shot${shots.length === 1 ? '' : 's'} • Scenestack Storyboard • ${dateStr}`, pad, pad + 56);
+
+      let loaded = 0;
+      const imgElements = [];
+
+      shots.forEach((shot, i) => {
+        const img = new Image();
+        img.onload = () => {
+          loaded++;
+          if (loaded === shots.length) drawAll();
+        };
+        img.onerror = () => {
+          loaded++;
+          if (loaded === shots.length) drawAll();
+        };
+        img.src = shot.block.imageData;
+        imgElements.push({ img, shot, index: i });
+      });
+
+      function drawAll() {
+        imgElements.forEach(({ img, shot, index }) => {
+          const c = index % cols;
+          const r = Math.floor(index / cols);
+
+          const x = pad + c * (cellW + pad);
+          const y = pad + headerH + r * (cellH + pad);
+
+          ctx.fillStyle = '#1C1C1E';
+          ctx.fillRect(x, y, cellW, cellH);
+
+          try {
+            if (img.complete && img.naturalWidth > 0) {
+              ctx.drawImage(img, x, y, shotW, shotH);
+            } else {
+              ctx.fillStyle = '#2C2C2E';
+              ctx.fillRect(x, y, shotW, shotH);
+              ctx.fillStyle = '#8E8E93';
+              ctx.font = '14px sans-serif';
+              ctx.fillText('Image unavailable', x + 20, y + shotH / 2);
+            }
+          } catch (e) {
+            ctx.fillStyle = '#2C2C2E';
+            ctx.fillRect(x, y, shotW, shotH);
+          }
+
+          ctx.strokeStyle = '#2C2C2E';
+          ctx.lineWidth = 1;
+          ctx.strokeRect(x, y, shotW, shotH);
+
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+          ctx.fillRect(x + 8, y + 8, 80, 22);
+          ctx.fillStyle = '#FFFFFF';
+          ctx.font = 'bold 11px sans-serif';
+          ctx.fillText(`SC ${shot.sceneNumber} • #${shot.shotNumber}`, x + 14, y + 23);
+
+          ctx.fillStyle = '#E5E5EA';
+          ctx.font = '500 13px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+          const capText = shot.caption || `${shot.sceneTitle} - Shot ${shot.shotNumber}`;
+          const maxTextW = cellW - 24;
+          let displayCap = capText;
+          if (ctx.measureText(displayCap).width > maxTextW) {
+            while (displayCap.length > 3 && ctx.measureText(displayCap + '...').width > maxTextW) {
+              displayCap = displayCap.slice(0, -1);
+            }
+            displayCap += '...';
+          }
+          ctx.fillText(displayCap, x + 12, y + shotH + 28);
+        });
+
+        try {
+          const dataUrl = canvas.toDataURL('image/png');
+          saveBase64File(filename, 'image/png', dataUrl);
+          showUndoToast(`✓ Exported storyboard (${shots.length} shots)`);
+        } catch (err) {
+          showToast('Failed to export storyboard: ' + err.message);
+        }
+      }
     }
 
     // ANDROID SYSTEM BACK NAVIGATION HANDLER
@@ -7386,6 +8278,11 @@
 
     function setupGlobalListeners() {
       document.getElementById('btn-home-settings').onclick = openFullSettingsSheet;
+      const btnHomeArchive = document.getElementById('btn-home-archive');
+      if (btnHomeArchive) btnHomeArchive.onclick = openArchivedProjectsSheet;
+      const btnHomeTrash = document.getElementById('btn-home-trash');
+      if (btnHomeTrash) btnHomeTrash.onclick = openTrashedProjectsSheet;
+
       document.getElementById('home-search-input').oninput = renderHome;
       document.getElementById('home-sort-select').onchange = renderHome;
       document.getElementById('btn-fab-new-project').onclick = openNewProjectSheet;
@@ -7399,7 +8296,37 @@
       document.getElementById('btn-editor-back').onclick = closeEditorToHome;
       document.getElementById('btn-topbar-undo').onclick = undo;
       document.getElementById('btn-topbar-redo').onclick = redo;
+      const btnEditorSettings = document.getElementById('btn-editor-settings');
+      if (btnEditorSettings) btnEditorSettings.onclick = openFullSettingsSheet;
       document.getElementById('btn-editor-menu').onclick = openStoryMenu;
+
+      const titleBtn = document.getElementById('editor-title-btn');
+      if (titleBtn) {
+        titleBtn.onclick = () => {
+          if (!CurrentProject) return;
+          showPromptSheet('Rename Story', 'Story Title', CurrentProject.title || '', false, (newTitle) => {
+            const trimmed = (newTitle || '').trim();
+            if (!trimmed) return;
+            CurrentProject.title = trimmed;
+            saveProjectData(CurrentProject);
+            const list = getProjectList();
+            const meta = list.find(m => m.id === CurrentProject.id);
+            if (meta) {
+              meta.title = trimmed;
+              saveProjectList(list);
+            }
+            const titleEl = document.getElementById('editor-project-title');
+            if (titleEl) titleEl.textContent = trimmed;
+            showUndoToast('Story renamed');
+          });
+        };
+      }
+
+      const wsEl = document.getElementById('editor-workspace');
+      if (wsEl) {
+        wsEl.addEventListener('scroll', handleWorkspaceScroll, { passive: true });
+      }
+
       document.getElementById('btn-toggle-format-quick').onclick = () => {
         ScreenplayFormat = !ScreenplayFormat;
         renderEditor();
@@ -7623,18 +8550,24 @@
     }
 
     function clearAllTrashPermanently() {
-      if (confirm('Permanently empty all trash across all projects?')) {
-        const list = getProjectList();
-        list.forEach(m => {
-          const p = loadProjectData(m.id);
-          if (p && p.trash) {
-            p.trash = { blocks: [], scenes: [] };
-            saveProjectData(p);
-          }
-        });
-        closeSheet();
-        showUndoToast('Trash emptied');
-      }
+      showConfirmSheet(
+        'Empty All Trash',
+        'Permanently empty all trash across all projects and remove all deleted files? This cannot be undone.',
+        'Empty All Trash',
+        true,
+        () => {
+          const list = getProjectList();
+          list.forEach(m => {
+            const p = loadProjectData(m.id);
+            if (p && p.trash) {
+              p.trash = { blocks: [], scenes: [] };
+              saveProjectData(p);
+            }
+          });
+          closeSheet();
+          showUndoToast('All project trash emptied');
+        }
+      );
     }
 
     function escapeHtml(str) {
